@@ -22,5 +22,8 @@ if ($signedIn) {
 }
 
 // 4. Generate the jsConnect string.
-$secure = true; // this should be true unless you are testing.
+
+// This should be true unless you are testing. 
+// You can also use a hash name like md5, sha1 etc which must be the name as the connection settings in Vanilla.
+$secure = true; 
 WriteJsConnect($user, $_GET, $clientID, $secret, $secure);
