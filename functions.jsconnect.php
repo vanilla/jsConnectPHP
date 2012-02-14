@@ -84,7 +84,6 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
    $String = http_build_query($Data, NULL, '&');
 //   echo "$String\n";
    $Signature = JsHash($String.$Secret, $HashType);
-   
    if ($ReturnData) {
       $Data['client_id'] = $ClientID;
       $Data['signature'] = $Signature;
@@ -104,15 +103,15 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
  */
 function JsHash($String, $Secure = TRUE) {
    switch ($Secure) {
-      case 'sha1':
-         return sha1($String);
-         break;
       case 'md5':
       case TRUE:
       case FALSE:
          return md5($String);
+      case 'sha1':
+         return sha1($String);
+         break;
       default:
-         return hash($Secure, $String);
+         return hash($Secure, $String).$Secure;
    }
 }
 
