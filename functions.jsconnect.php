@@ -2,7 +2,7 @@
 /**
  * This file contains the client code for Vanilla jsConnect single sign on.
  * @author Todd Burry <todd@vanillaforums.com>
- * @version 1.1b
+ * @version 1.2b
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
@@ -117,4 +117,21 @@ function JsHash($String, $Secure = TRUE) {
 
 function JsTimestamp() {
    return time();
+}
+
+/**
+ * Generate an SSO string suitible for passing in the url for embedded SSO.
+ * 
+ * @param array $User The user to sso.
+ * @param string $ClientID Your client ID.
+ * @param string $Secret Your secret.
+ * @return string
+ */
+function JsSSOString($User, $ClientID, $Secret) {
+   $String = base64_encode(json_encode($User));
+   $Timestamp = time();
+   $Hash = hash_hmac('sha1', "$String $Timestamp", $Secret);
+   
+   $Result = "$String $Hash $Timestamp hmacsha1";
+   return $Result;
 }
