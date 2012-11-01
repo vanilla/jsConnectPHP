@@ -128,6 +128,9 @@ function JsTimestamp() {
  * @return string
  */
 function JsSSOString($User, $ClientID, $Secret) {
+   if (!isset($User['client_id']))
+      $User['client_id'] = $ClientID;
+   
    $String = base64_encode(json_encode($User));
    $Timestamp = time();
    $Hash = hash_hmac('sha1', "$String $Timestamp", $Secret);
