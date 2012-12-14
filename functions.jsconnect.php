@@ -2,7 +2,7 @@
 /**
  * This file contains the client code for Vanilla jsConnect single sign on.
  * @author Todd Burry <todd@vanillaforums.com>
- * @version 1.2b
+ * @version 1.3b
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
@@ -102,16 +102,18 @@ function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE
  * @since 1.1b
  */
 function JsHash($String, $Secure = TRUE) {
+   if ($Secure === TRUE)
+      $Secure = 'md5';
+   
    switch ($Secure) {
-      case 'md5':
-      case TRUE:
-      case FALSE:
-         return md5($String);
       case 'sha1':
          return sha1($String);
          break;
+      case 'md5':
+      case FALSE:
+         return md5($String);
       default:
-         return hash($Secure, $String).$Secure;
+         return hash($Secure, $String);
    }
 }
 
