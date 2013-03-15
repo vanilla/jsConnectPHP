@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__).'/functions.jsconnect.php';;
+require_once dirname(__FILE__).'/functions.jsconnect.php';
 
 // 1. Get your client ID and secret here. These must match those in your jsConnect settings.
 $clientID = "1234";
