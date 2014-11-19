@@ -35,7 +35,7 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
       elseif (!isset($Request['timestamp']) && !isset($Request['signature'])) {
          if (is_array($User) && count($User) > 0) {
             // This isn't really an error, but we are just going to return public information when no signature is sent.
-            $Error = array('name' => $User['name'], 'photourl' => @$User['photourl']);
+            $Error = array('name' => (string)@$User['name'], 'photourl' => @$User['photourl'], 'signedin' => true);
          } else {
             $Error = array('name' => '', 'photourl' => '');
          }
@@ -73,15 +73,15 @@ function WriteJsConnect($User, $Request, $ClientID, $Secret, $Secure = TRUE) {
 }
 
 function SignJsConnect($Data, $ClientID, $Secret, $HashType, $ReturnData = FALSE) {
-   $Data = array_change_key_case($Data);
-   ksort($Data);
+   $Data2 = array_change_key_case($Data);
+   ksort($Data2);
 
-   foreach ($Data as $Key => $Value) {
+   foreach ($Data2 as $Key => $Value) {
       if ($Value === NULL)
          $Data[$Key] = '';
    }
    
-   $String = http_build_query($Data, NULL, '&');
+   $String = http_build_query($Data2, NULL, '&');
 //   echo "$String\n";
    $Signature = JsHash($String.$Secret, $HashType);
    if ($ReturnData) {
