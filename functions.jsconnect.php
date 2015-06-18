@@ -14,7 +14,7 @@ define('JS_TIMEOUT', 24 * 60);
  * @param array $User An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
  * @param array $Request An array of the $_GET request.
  * @param string $ClientID The string client ID that you set up in the jsConnect settings page.
- * @param string $Secret The string secred that you set up in the jsConnect settings page.
+ * @param string $Secret The string secret that you set up in the jsConnect settings page.
  * @param string|bool $Secure Whether or not to check for security. This is one of these values.
  *  - true: Check for security and sign the response with an md5 hash.
  *  - false: Don't check for security, but sign the response with an md5 hash.
