@@ -122,7 +122,7 @@ function JsTimestamp() {
 }
 
 /**
- * Generate an SSO string suitible for passing in the url for embedded SSO.
+ * Generate an SSO string suitable for passing in the url for embedded SSO.
  * 
  * @param array $User The user to sso.
  * @param string $ClientID Your client ID.
