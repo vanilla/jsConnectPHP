@@ -14,16 +14,16 @@ $signedIn = true; // this is just a placeholder
 $user = array();
 
 if ($signedIn) {
-   // CHANGE THESE FOUR LINES.
-   $user['uniqueid'] = '123';
-   $user['name'] = 'John PHP';
-   $user['email'] = 'john.php@anonymous.com';
-   $user['photourl'] = '';
+    // CHANGE THESE FOUR LINES.
+    $user['uniqueid'] = '123';
+    $user['name'] = 'John PHP';
+    $user['email'] = 'john.php@anonymous.com';
+    $user['photourl'] = '';
 }
 
 // 4. Generate the jsConnect string.
 
-// This should be true unless you are testing. 
+// This should be true unless you are testing.
 // You can also use a hash name like md5, sha1 etc which must be the name as the connection settings in Vanilla.
-$secure = true; 
-WriteJsConnect($user, $_GET, $clientID, $secret, $secure);
+$secure = true;
+writeJsConnect($user, $_GET, $clientID, $secret, $secure);
