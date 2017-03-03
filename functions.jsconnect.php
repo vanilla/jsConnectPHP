@@ -98,7 +98,7 @@ function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false
     }
 
     $string = http_build_query($data2, null, '&');
-    $signature = ssHash($string.$secret, $hashType);
+    $signature = jsHash($string.$secret, $hashType);
     if ($returnData) {
         $data['client_id'] = $clientID;
         $data['signature'] = $signature;
