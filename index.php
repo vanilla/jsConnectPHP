@@ -17,7 +17,7 @@ if ($signedIn) {
     // CHANGE THESE FOUR LINES.
     $user['uniqueid'] = '123';
     $user['name'] = 'John PHP';
-    $user['email'] = 'john.php@anonymous.com';
+    $user['email'] = 'john.php@example.com';
     $user['photourl'] = '';
 }
 

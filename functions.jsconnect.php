@@ -8,6 +8,7 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
+define('JS_CONNECT_VERSION', 2);
 define('JS_TIMEOUT', 24 * 60);
 
 /**
@@ -32,7 +33,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
         // Check the client.
         if (!isset($request['v'])) {
             $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
-        } elseif ($request['v'] !== '2') {
+        } elseif ($request['v'] !== JS_CONNECT_VERSION) {
             $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
         } elseif (!isset($request['client_id'])) {
             $error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
@@ -73,7 +74,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
             $user['ip'] = $request['ip'];
             $user['nonce'] = $request['nonce'];
             $result = signJsConnect($user, $clientID, $secret, $secure, true);
-            $result['v'] = '2';
+            $result['v'] = JS_CONNECT_VERSION;
         }
     } else {
         $result = array('name' => '', 'photourl' => '');
@@ -102,9 +103,9 @@ function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false
     $normalizedData = array_change_key_case($data);
     ksort($normalizedData);
 
-    foreach ($normalizedData as $Key => $value) {
+    foreach ($normalizedData as $key => $value) {
         if ($value === null) {
-            $normalizedData[$Key] = '';
+            $normalizedData[$key] = '';
         }
     }
 
