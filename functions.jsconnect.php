@@ -3,12 +3,11 @@
  * This file contains the client code for Vanilla jsConnect single sign on.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @version 2.0
- * @copyright 2008-2017 Vanilla Forums, Inc.
- * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
+ * @version 1.3b
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-define('JS_CONNECT_VERSION', '2');
 define('JS_TIMEOUT', 24 * 60);
 
 /**
@@ -31,15 +30,11 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
     // Error checking.
     if ($secure) {
         // Check the client.
-        if (!isset($request['v'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
-        } elseif ($request['v'] !== JS_CONNECT_VERSION) {
-            $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
-        } elseif (!isset($request['client_id'])) {
+        if (!isset($request['client_id'])) {
             $error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
         } elseif ($request['client_id'] != $clientID) {
             $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
-        } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
+        } elseif (!isset($request['timestamp']) && !isset($request['signature'])) {
             if (is_array($user) && count($user) > 0) {
                 // This isn't really an error, but we are just going to return public information when no signature is sent.
                 $error = array('name' => (string)@$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true);
@@ -48,18 +43,14 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
             }
         } elseif (!isset($request['timestamp']) || !is_numeric($request['timestamp'])) {
             $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
-        } elseif (!isset($request['sig'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing sig parameter.');
-        } // Make sure the timestamp hasn't timedout
-        elseif (abs($request['timestamp'] - JsTimestamp()) > JS_TIMEOUT) {
+        } elseif (!isset($request['signature'])) {
+            $error = array('error' => 'invalid_request', 'message' => 'Missing  signature parameter.');
+        } elseif (($Diff = abs($request['timestamp'] - jsTimestamp())) > JS_TIMEOUT) {
             $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
-        } elseif (!isset($request['nonce'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing nonce parameter.');
-        } elseif (!isset($request['ip'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing ip parameter.');
         } else {
-            $signature = jsHash($request['ip'].$request['nonce'].$request['timestamp'].$secret, $secure);
-            if ($signature != $request['sig']) {
+            // Make sure the timestamp hasn't timed out.
+            $signature = jsHash($request['timestamp'].$secret, $secure);
+            if ($signature != $request['signature']) {
                 $error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
             }
         }
@@ -71,10 +62,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
         if ($secure === null) {
             $result = $user;
         } else {
-            $user['ip'] = $request['ip'];
-            $user['nonce'] = $request['nonce'];
             $result = signJsConnect($user, $clientID, $secret, $secure, true);
-            $result['v'] = JS_CONNECT_VERSION;
         }
     } else {
         $result = array('name' => '', 'photourl' => '');
@@ -97,24 +85,24 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
  * @param $secret
  * @param $hashType
  * @param bool $returnData
- * @return array|string
+ * @return mixed
  */
 function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
-    $normalizedData = array_change_key_case($data);
-    ksort($normalizedData);
+    $data2 = array_change_key_case($data);
+    ksort($data2);
 
-    foreach ($normalizedData as $key => $value) {
+    foreach ($data2 as $key => $value) {
         if ($value === null) {
-            $normalizedData[$key] = '';
+            $data[$key] = '';
         }
     }
 
-    $stringifiedData = http_build_query($normalizedData, null, '&');
-    $signature = jsHash($stringifiedData.$secret, $hashType);
+    $string = http_build_query($data2, null, '&');
+    $signature = jsHash($string.$secret, $hashType);
     if ($returnData) {
-        $normalizedData['client_id'] = $clientID;
-        $normalizedData['sig'] = $signature;
-        return $normalizedData;
+        $data['client_id'] = $clientID;
+        $data['signature'] = $signature;
+        return $data;
     } else {
         return $signature;
     }
@@ -126,6 +114,7 @@ function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false
  * @param string $string The string to hash.
  * @param string|bool $secure The hash algorithm to use. true means md5.
  * @return string
+ * @since 1.1b
  */
 function jsHash($string, $secure = true) {
     if ($secure === true) {
