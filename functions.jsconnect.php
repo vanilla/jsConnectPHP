@@ -8,7 +8,7 @@
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-define('JS_CONNECT_VERSION', '2');
+define('JS_CONNECT_VERSION', 2);
 define('JS_TIMEOUT', 24 * 60);
 
 /**
