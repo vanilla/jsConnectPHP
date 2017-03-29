@@ -12,7 +12,7 @@ require_once(__DIR__.'/../functions.jsConnect.php');
 /**
  * Unit tests signJsConnect
  */
-class signJsConnectTest extends \PHPUnit_Framework_TestCase {
+class SignJsConnectTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @param $data
