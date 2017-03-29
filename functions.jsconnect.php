@@ -36,7 +36,7 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
         } elseif ($request['v'] !== JS_CONNECT_VERSION) {
             $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
         } elseif (!isset($request['client_id'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'The client_id parameter is missing.');
+            $error = array('error' => 'invalid_request', 'message' => 'Missing the client_id parameter.');
         } elseif ($request['client_id'] != $clientID) {
             $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
         } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
@@ -46,17 +46,17 @@ function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
             } else {
                 $error = array('name' => '', 'photourl' => '');
             }
-        } elseif (!isset($request['timestamp']) || !is_numeric($request['timestamp'])) {
+        } elseif (!isset($request['timestamp']) || !ctype_digit($request['timestamp'])) {
             $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
         } elseif (!isset($request['sig'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing sig parameter.');
+            $error = array('error' => 'invalid_request', 'message' => 'Missing the sig parameter.');
         } // Make sure the timestamp hasn't timedout
         elseif (abs($request['timestamp'] - JsTimestamp()) > JS_TIMEOUT) {
             $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
         } elseif (!isset($request['nonce'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing nonce parameter.');
+            $error = array('error' => 'invalid_request', 'message' => 'Missing the nonce parameter.');
         } elseif (!isset($request['ip'])) {
-            $error = array('error' => 'invalid_request', 'message' => 'Missing ip parameter.');
+            $error = array('error' => 'invalid_request', 'message' => 'Missing the ip parameter.');
         } else {
             $signature = jsHash($request['ip'].$request['nonce'].$request['timestamp'].$secret, $secure);
             if ($signature != $request['sig']) {
