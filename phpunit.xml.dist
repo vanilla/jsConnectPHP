@@ -9,26 +9,27 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/phpunit.php"
         >
-  <php>
-    <ini name="intl.default_locale" value="en"/>
-    <ini name="intl.error_level" value="0"/>
-    <ini name="memory_limit" value="-1"/>
-  </php>
+    <php>
+        <ini name="intl.default_locale" value="en"/>
+        <ini name="intl.error_level" value="0"/>
+        <ini name="memory_limit" value="-1"/>
+        <ini name="date.timezone" value="America/Montreal"/>
+    </php>
 
-  <testsuites>
-    <testsuite name="jsConnectPHP Test Suite">
-      <directory suffix="Test.php">tests</directory>
-    </testsuite>
-  </testsuites>
+    <testsuites>
+        <testsuite name="Library">
+            <directory suffix="Test.php">./tests/</directory>
+        </testsuite>
+    </testsuites>
 
-  <filter>
-    <whitelist>
-      <file>functions.jsconnect.php</file>
-      <exclude>
-        <directory>tests</directory>
-      </exclude>
-    </whitelist>
-  </filter>
+    <filter>
+        <whitelist>
+            <file>functions.jsconnect.php</file>
+            <exclude>
+                <directory>tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

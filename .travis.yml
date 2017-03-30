@@ -8,8 +8,17 @@ php:
     - 7.1
     - hhvm
 
+sudo: false
+
 matrix:
-    fast_finish: true
+  allow_failures:
+    - php: hhvm
+  fast_finish: true
+
+addons:
+  apt:
+    packages:
+      - realpath
 
 install:
     - composer self-update
@@ -29,8 +38,5 @@ install:
           fi
       fi
 
-script: ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
-
-after_script:
-    - wget https://scrutinizer-ci.com/ocular.phar
-    - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+script:
+  - ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
