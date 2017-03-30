@@ -9,7 +9,6 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="tests/phpunit.php"
         >
     <php>
         <ini name="intl.default_locale" value="en"/>
@@ -19,16 +18,16 @@
     </php>
 
     <testsuites>
-        <testsuite name="Library">
+        <testsuite name="All">
             <directory suffix="Test.php">./tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
-        <whitelist>
+        <whitelist addUncoveredFilesFromWhitelist="false">
             <file>functions.jsconnect.php</file>
             <exclude>
-                <directory>tests</directory>
+                <file>index.php</file>
             </exclude>
         </whitelist>
     </filter>
