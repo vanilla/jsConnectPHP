@@ -3,7 +3,7 @@
  * This file contains the client code for Vanilla jsConnect single sign on.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @version 1.3b
+ * @version 1.3
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
