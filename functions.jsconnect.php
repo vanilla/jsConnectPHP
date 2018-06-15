@@ -109,7 +109,8 @@ function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false
         }
     }
 
-    $stringifiedData = http_build_query($normalizedData, null, '&');
+    // RFC1738 state that spaces are encoded as '+'.
+    $stringifiedData = http_build_query($normalizedData, null, '&', PHP_QUERY_RFC1738);
     $signature = jsHash($stringifiedData.$secret, $hashType);
     if ($returnData) {
         $normalizedData['client_id'] = $clientID;
