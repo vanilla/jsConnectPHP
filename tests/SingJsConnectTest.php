@@ -10,7 +10,7 @@ namespace JsConnect\Tests;
 /**
  * Unit tests signJsConnect
  */
-class SignJsConnectTest extends \PHPUnit_Framework_TestCase {
+class SignJsConnectTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @param $data

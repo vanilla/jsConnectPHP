@@ -10,7 +10,7 @@ namespace JsConnect\Tests;
 /**
  * Unit tests hashing
  */
-class HashTest extends \PHPUnit_Framework_TestCase {
+class HashTest extends \PHPUnit\Framework\TestCase {
 
     /**
      *  Test {@link jsHash} with no $secure parameter.
