@@ -1,31 +1,15 @@
 language: php
 
 php:
-    - 5.4
-    - 5.5
-    - 5.6
-    - 7.0
     - 7.1
     - 7.2
-    - hhvm
+    - 7.3
 
 matrix:
-  allow_failures:
-    - php: hhvm
-  fast_finish: true
+    fast_finish: true
 
 install:
     - composer self-update
-    - |
-      if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
-          composer require "phpunit/phpunit=~5.7"
-      else
-          if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then
-              composer require "phpunit/phpunit=~5"
-          else
-              composer require "phpunit/phpunit=~4.8"
-          fi
-      fi
-
+    - composer require "phpunit/phpunit=~7.5"
 
 script: ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
