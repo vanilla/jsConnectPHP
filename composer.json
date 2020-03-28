@@ -17,7 +17,7 @@
     ],
     "autoload": {
         "files": [
-            "functions.jsconnect.php"
+            "functions.compat.php"
         ],
         "psr-4": {
             "Vanilla\\JsConnect\\": "src"
