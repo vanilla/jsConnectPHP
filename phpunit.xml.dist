@@ -8,7 +8,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         bootstrap="tests/phpunit.php"
+         bootstrap="vendor/autoload.php"
         >
     <php>
         <ini name="intl.default_locale" value="en"/>

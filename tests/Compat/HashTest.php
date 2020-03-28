@@ -1,16 +1,18 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-namespace JsConnect\Tests;
+namespace Vanilla\JsConnect\Tests\Compat;
+
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests hashing
  */
-class HashTest extends \PHPUnit\Framework\TestCase {
+class HashTest extends TestCase {
 
     /**
      *  Test {@link jsHash} with no $secure parameter.
