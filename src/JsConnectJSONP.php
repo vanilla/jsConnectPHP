@@ -42,16 +42,16 @@ namespace Vanilla\JsConnect {
         }
 
         /**
-         *
-         *
          * @param $data
          * @param $clientID
          * @param $secret
          * @param $hashType
          * @param bool $returnData
+         * @param array $data
+         *
          * @return array|string
          */
-        public static function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
+        public static function signJsConnect(array $data, $clientID, $secret, $hashType, $returnData = false) {
             $normalizedData = array_change_key_case($data);
             ksort($normalizedData);
 
@@ -145,8 +145,9 @@ namespace Vanilla\JsConnect {
          * @param $clientID
          * @param $secret
          * @param $secure
+         * @param bool|string $secure
          */
-        private static function writeJSONP($user, $request, $clientID, $secret, $secure): void {
+        private static function writeJSONP(array $user, array $request, string $clientID, string $secret, $secure): void {
             $user = array_change_key_case($user);
 
             // Error checking.

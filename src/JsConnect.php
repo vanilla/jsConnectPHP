@@ -170,6 +170,9 @@ class JsConnect {
         return $payload;
     }
 
+    /**
+     * @param array|object $o
+     */
     protected function stdClassToArray($o): array {
         if (is_scalar($o)) {
             throw new \UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
@@ -250,7 +253,7 @@ class JsConnect {
      * Validate that a field exists in a collection.
      *
      * @param string $field The name of the field to validate.
-     * @param array|\ArrayAccess $collection The collection to look at.
+     * @param mixed $collection The collection to look at.
      * @param string $collectionName The name of the collection.
      * @param bool $validateEmpty If true, make sure the value is also not empty.
      * @throws FieldNotFoundException

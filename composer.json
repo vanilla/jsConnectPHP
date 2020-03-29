@@ -3,6 +3,7 @@
     "description": "Client library for Vanilla's jsConnect SSO system.",
     "type": "library",
     "require": {
+        "php": ">=7.1.0",
         "firebase/php-jwt": "^5.2"
     },
     "require-dev": {
