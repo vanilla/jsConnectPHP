@@ -6,7 +6,11 @@
         "firebase/php-jwt": "^5.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "~7.0"
+        "phpunit/phpunit": "~7.0",
+        "classpreloader/classpreloader": "^4.0",
+        "classpreloader/console": "^3.0",
+        "vanilla/standards": "^1.3",
+        "vimeo/psalm": "^3.10"
     },
     "license": "MIT",
     "authors": [
@@ -17,7 +21,7 @@
     ],
     "autoload": {
         "files": [
-            "functions.compat.php"
+            "src/functions.compat.php"
         ],
         "psr-4": {
             "Vanilla\\JsConnect\\": "src"

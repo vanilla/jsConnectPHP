@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license MIT
+ */
+
+chdir(__DIR__);
+$command = __DIR__.'/vendor/bin/classpreloader';
+$output = $argv[1] ?? "dist/functions.jsconnect.php";
+$args = "compile --config=./build-config.php --output=$output";
+
+passthru("$command $args");
+
+try {
+    $fp = fopen($output, 'a+');
+    $functions = file_get_contents(__DIR__ . "/src/functions.compat.php");
+    $functions = substr($functions, strpos($functions, "\n"));
+    fwrite($fp, $functions);
+} finally {
+    fclose($fp);
+}
