@@ -23,6 +23,7 @@ class JsConnect {
     const FIELD_PHOTO = 'photo';
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
+    const FIELD_JWT = 'jwt';
 
     const TIMEOUT = 10 * 60;
 
@@ -38,12 +39,24 @@ class JsConnect {
      */
     protected $keys;
 
+    /**
+     * @var string string
+     */
     protected $signingClientID = '';
 
+    /**
+     * @var array
+     */
     protected $user = [];
 
+    /**
+     * @var string
+     */
     protected $signingAlgorithm;
 
+    /**
+     * JsConnect constructor.
+     */
     public function __construct() {
         $this->keys = new \ArrayObject();
         $this->setSigningAlgorithm('HS256');
@@ -56,17 +69,17 @@ class JsConnect {
      * @return $this
      */
     public function setEmail(string $email) {
-        return $this->setField(self::FIELD_EMAIL, $email);
+        return $this->setUserField(self::FIELD_EMAIL, $email);
     }
 
     /**
      * Set the a field on the current user.
      *
-     * @param string $key
-     * @param $value
+     * @param string $key The key on the user.
+     * @param string|int|bool|array|null $value The value to set. This must be a basic type that can be JSON encoded.
      * @return $this
      */
-    public function setField(string $key, $value) {
+    public function setUserField(string $key, $value) {
         $this->user[$key] = $value;
         return $this;
     }
@@ -78,7 +91,7 @@ class JsConnect {
      * @return $this
      */
     public function setName(string $name) {
-        return $this->setField(self::FIELD_NAME, $name);
+        return $this->setUserField(self::FIELD_NAME, $name);
     }
 
     /**
@@ -88,7 +101,7 @@ class JsConnect {
      * @return $this
      */
     public function setPhotoURL(string $photo) {
-        return $this->setField(self::FIELD_PHOTO, $photo);
+        return $this->setUserField(self::FIELD_PHOTO, $photo);
     }
 
     /**
@@ -98,16 +111,17 @@ class JsConnect {
      * @return $this
      */
     public function setUniqueID(string $id) {
-        return $this->setField(self::FIELD_UNIQUE_ID, $id);
+        return $this->setUserField(self::FIELD_UNIQUE_ID, $id);
     }
 
     /**
      * Handle the authentication request and redirect back to Vanilla.
      *
-     * @param string $jwt
+     * @param array $query
      */
-    public function handleRequest(string $jwt) {
+    public function handleRequest(array $query): void {
         try {
+            $jwt = static::validateFieldExists(self::FIELD_JWT, $query, 'querystring');
             $location = $this->generateResponseLocation($jwt);
             $this->redirect($location);
         } catch (Exception $ex) {
@@ -136,6 +150,13 @@ class JsConnect {
         return $location;
     }
 
+    /**
+     * Set the credentials that will be used to sign requests.
+     *
+     * @param string $clientID
+     * @param string $secret
+     * @return $this
+     */
     public function setSigningCredentials(string $clientID, string $secret) {
         $this->keys[$clientID] = $secret;
         $this->signingClientID = $clientID;
@@ -165,19 +186,26 @@ class JsConnect {
      * @return array
      */
     protected function jwtDecode(string $jwt): array {
+        /**
+         * @psalm-suppress InvalidArgument
+         */
         $payload = JWT::decode($jwt, $this->keys, self::ALLOWED_ALGORITHMS);
         $payload = $this->stdClassToArray($payload);
         return $payload;
     }
 
     /**
+     * Convert an object to an array, recursively.
+     *
      * @param array|object $o
+     * @return array
      */
     protected function stdClassToArray($o): array {
-        if (is_scalar($o)) {
+        if (!is_array($o) && !($o instanceof \stdClass)) {
             throw new \UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
         }
 
+        $o = (array)$o;
         $r = [];
         foreach ($o as $key => $value) {
             if (is_array($value) || is_object($value)) {
@@ -222,8 +250,9 @@ class JsConnect {
     /**
      * @param string $location
      */
-    protected function redirect(string $location) {
+    protected function redirect(string $location): void {
         header("Location: $location", true, 302);
+        die();
     }
 
     public function getUser(): array {
@@ -256,12 +285,13 @@ class JsConnect {
      * @param mixed $collection The collection to look at.
      * @param string $collectionName The name of the collection.
      * @param bool $validateEmpty If true, make sure the value is also not empty.
+     * @return mixed Returns the field value if there are no errors.
      * @throws FieldNotFoundException
      * @throws InvalidValueException
      */
     protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
         if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
-            throw new InvalidValueException("The payload is not a valid array.", 400);
+            throw new InvalidValueException("The payload is not a valid array.");
         }
 
         if (!isset($collection[$field])) {
@@ -271,5 +301,7 @@ class JsConnect {
         if ($validateEmpty && empty($collection[$field])) {
             throw new InvalidValueException("Field cannot be empty: {$collectionName}[{$field}]");
         }
+
+        return $collection[$field];
     }
 }

@@ -22,43 +22,107 @@ final class JsConnectJSONP
      *  - null: Don't check for security and don't sign the response.
      * @since 1.1b Added the ability to provide a hash algorithm to $secure.
      */
-    public static function writeJsConnect($user, $request, $clientID, $secret, $secure = true)
+    public static function writeJsConnect($user, $request, $clientID, $secret, $secure = true) : void
     {
         if (isset($request['jwt'])) {
-            self::writeJWT($user, $request['jwt'], $clientID, $secret);
+            self::writeJWT($user, $request, $clientID, $secret);
         } else {
             self::writeJSONP($user, $request, $clientID, $secret, $secure);
         }
     }
+    protected static function writeJWT(array $user, array $query, string $clientID, string $secret) : void
+    {
+        $jsc = new JsConnect();
+        $jsc->setSigningCredentials($clientID, $secret);
+        foreach ($user as $key => $value) {
+            if (isset(self::FIELD_MAP[$key])) {
+                $key = $user[self::FIELD_MAP[$key]];
+            }
+            $jsc->setUserField($key, $value);
+        }
+        $jsc->handleRequest($query);
+    }
+    /**
+     * @param $user
+     * @param $request
+     * @param $clientID
+     * @param $secret
+     * @param $secure
+     * @param bool|string|null $secure
+     */
+    protected static function writeJSONP(array $user, array $request, string $clientID, string $secret, $secure) : void
+    {
+        $user = array_change_key_case($user);
+        // Error checking.
+        if ($secure) {
+            // Check the client.
+            if (!isset($request['v'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
+            } elseif ($request['v'] !== self::VERSION) {
+                $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
+            } elseif (!isset($request['client_id'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'Missing the client_id parameter.');
+            } elseif ($request['client_id'] != $clientID) {
+                $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
+            } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
+                if (count($user) > 0) {
+                    // This isn't really an error, but we are just going to return public information when no signature is sent.
+                    $error = array('name' => (string) @$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true);
+                } else {
+                    $error = array('name' => '', 'photourl' => '');
+                }
+            } elseif (!isset($request['timestamp']) || !ctype_digit($request['timestamp'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
+            } elseif (!isset($request['sig'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'Missing the sig parameter.');
+            } elseif (abs($request['timestamp'] - self::timestamp()) > self::TIMEOUT) {
+                $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
+            } elseif (!isset($request['nonce'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'Missing the nonce parameter.');
+            } elseif (!isset($request['ip'])) {
+                $error = array('error' => 'invalid_request', 'message' => 'Missing the ip parameter.');
+            } else {
+                $signature = self::hash($request['ip'] . $request['nonce'] . $request['timestamp'] . $secret, $secure);
+                if ($signature != $request['sig']) {
+                    $error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
+                }
+            }
+        }
+        if (isset($error)) {
+            $result = $error;
+        } elseif (count($user) > 0) {
+            if ($secure === null) {
+                $result = $user;
+            } else {
+                $user['ip'] = $request['ip'];
+                $user['nonce'] = $request['nonce'];
+                $result = self::signJsConnect($user, $clientID, $secret, $secure, true);
+                /**
+                 * @psalm-suppress PossiblyInvalidArrayOffset
+                 */
+                $result['v'] = self::VERSION;
+            }
+        } else {
+            $result = ['name' => '', 'photourl' => ''];
+        }
+        $content = json_encode($result);
+        if (isset($request['callback'])) {
+            $content = "{$request['callback']}({$content})";
+        }
+        if (!headers_sent()) {
+            $contentType = self::contentType($request);
+            header($contentType, true);
+        }
+        echo $content;
+    }
     /**
      *
      *
-     * @param $data
-     * @param $clientID
-     * @param $secret
-     * @param $hashType
-     * @param bool $returnData
-     * @return array|string
+     * @return int
      */
-    public static function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false)
+    public static function timestamp()
     {
-        $normalizedData = array_change_key_case($data);
-        ksort($normalizedData);
-        foreach ($normalizedData as $key => $value) {
-            if ($value === null) {
-                $normalizedData[$key] = '';
-            }
-        }
-        // RFC1738 state that spaces are encoded as '+'.
-        $stringifiedData = http_build_query($normalizedData, null, '&', PHP_QUERY_RFC1738);
-        $signature = self::hash($stringifiedData . $secret, $hashType);
-        if ($returnData) {
-            $normalizedData['client_id'] = $clientID;
-            $normalizedData['sig'] = $signature;
-            return $normalizedData;
-        } else {
-            return $signature;
-        }
+        return time();
     }
     /**
      * Return the hash of a string.
@@ -84,13 +148,46 @@ final class JsConnectJSONP
         }
     }
     /**
+     * @param $data
+     * @param $clientID
+     * @param $secret
+     * @param string|bool $hashType
+     * @param bool $returnData
+     * @param array $data
      *
-     *
-     * @return int
+     * @return array|string
      */
-    public static function timestamp()
+    public static function signJsConnect(array $data, string $clientID, string $secret, $hashType, bool $returnData = false)
     {
-        return time();
+        $normalizedData = array_change_key_case($data);
+        ksort($normalizedData);
+        foreach ($normalizedData as $key => $value) {
+            if ($value === null) {
+                $normalizedData[$key] = '';
+            }
+        }
+        // RFC1738 state that spaces are encoded as '+'.
+        $stringifiedData = http_build_query($normalizedData, '', '&', PHP_QUERY_RFC1738);
+        $signature = self::hash($stringifiedData . $secret, $hashType);
+        if ($returnData) {
+            $normalizedData['client_id'] = $clientID;
+            $normalizedData['sig'] = $signature;
+            return $normalizedData;
+        } else {
+            return $signature;
+        }
+    }
+    /**
+     * Based on a jsConnect request, determine the proper response content type.
+     *
+     * @param array $request
+     * @return string
+     */
+    public static function contentType(array $request) : string
+    {
+        $isJsonp = isset($request["callback"]);
+        $contentType = $isJsonp ? "Content-Type: application/javascript; charset=utf-8" : "Content-Type: application/json; charset=utf-8";
+        return $contentType;
     }
     /**
      * Generate an SSO string suitable for passing in the url for embedded SSO.
@@ -111,99 +208,6 @@ final class JsConnectJSONP
         $result = "{$string} {$hash} {$timestamp} hmacsha1";
         return $result;
     }
-    /**
-     * Based on a jsConnect request, determine the proper response content type.
-     *
-     * @param array $request
-     * @return string
-     */
-    public static function contentType(array $request) : string
-    {
-        $isJsonp = isset($request["callback"]);
-        $contentType = $isJsonp ? "Content-Type: application/javascript; charset=utf-8" : "Content-Type: application/json; charset=utf-8";
-        return $contentType;
-    }
-    /**
-     * @param $user
-     * @param $request
-     * @param $clientID
-     * @param $secret
-     * @param $secure
-     */
-    private static function writeJSONP($user, $request, $clientID, $secret, $secure) : void
-    {
-        $user = array_change_key_case($user);
-        // Error checking.
-        if ($secure) {
-            // Check the client.
-            if (!isset($request['v'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'Missing the v parameter.');
-            } elseif ($request['v'] !== self::VERSION) {
-                $error = array('error' => 'invalid_request', 'message' => "Unsupported version {$request['v']}.");
-            } elseif (!isset($request['client_id'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'Missing the client_id parameter.');
-            } elseif ($request['client_id'] != $clientID) {
-                $error = array('error' => 'invalid_client', 'message' => "Unknown client {$request['client_id']}.");
-            } elseif (!isset($request['timestamp']) && !isset($request['sig'])) {
-                if (is_array($user) && count($user) > 0) {
-                    // This isn't really an error, but we are just going to return public information when no signature is sent.
-                    $error = array('name' => (string) @$user['name'], 'photourl' => @$user['photourl'], 'signedin' => true);
-                } else {
-                    $error = array('name' => '', 'photourl' => '');
-                }
-            } elseif (!isset($request['timestamp']) || !ctype_digit($request['timestamp'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
-            } elseif (!isset($request['sig'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'Missing the sig parameter.');
-            } elseif (abs($request['timestamp'] - self::timestamp()) > self::TIMEOUT) {
-                $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
-            } elseif (!isset($request['nonce'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'Missing the nonce parameter.');
-            } elseif (!isset($request['ip'])) {
-                $error = array('error' => 'invalid_request', 'message' => 'Missing the ip parameter.');
-            } else {
-                $signature = self::hash($request['ip'] . $request['nonce'] . $request['timestamp'] . $secret, $secure);
-                if ($signature != $request['sig']) {
-                    $error = array('error' => 'access_denied', 'message' => 'Signature invalid.');
-                }
-            }
-        }
-        if (isset($error)) {
-            $result = $error;
-        } elseif (is_array($user) && count($user) > 0) {
-            if ($secure === null) {
-                $result = $user;
-            } else {
-                $user['ip'] = $request['ip'];
-                $user['nonce'] = $request['nonce'];
-                $result = self::signJsConnect($user, $clientID, $secret, $secure, true);
-                $result['v'] = self::VERSION;
-            }
-        } else {
-            $result = array('name' => '', 'photourl' => '');
-        }
-        $content = json_encode($result);
-        if (isset($request['callback'])) {
-            $content = "{$request['callback']}({$content})";
-        }
-        if (!headers_sent()) {
-            $contentType = self::contentType($request);
-            header($contentType, true);
-        }
-        echo $content;
-    }
-    private static function writeJWT(array $user, string $jwt, string $clientID, string $secret)
-    {
-        $jsc = new JsConnect();
-        $jsc->setClientID($clientID)->setSecret($secret);
-        foreach ($user as $key => $value) {
-            if (isset(self::FIELD_MAP[$key])) {
-                $key = $user[self::FIELD_MAP[$key]];
-            }
-            $jsc->setField($key, $value);
-        }
-        $jsc->handleRequest($jwt);
-    }
 }
 }
 
@@ -223,6 +227,7 @@ class JsConnect
     const FIELD_PHOTO = 'photo';
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
+    const FIELD_JWT = 'jwt';
     const TIMEOUT = 10 * 60;
     const ALLOWED_ALGORITHMS = ['ES256', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512'];
     const FIELD_STATE = 'st';
@@ -232,9 +237,21 @@ class JsConnect
      * @var \ArrayAccess
      */
     protected $keys;
+    /**
+     * @var string string
+     */
     protected $signingClientID = '';
+    /**
+     * @var array
+     */
     protected $user = [];
+    /**
+     * @var string
+     */
     protected $signingAlgorithm;
+    /**
+     * JsConnect constructor.
+     */
     public function __construct()
     {
         $this->keys = new \ArrayObject();
@@ -248,16 +265,16 @@ class JsConnect
      */
     public function setEmail(string $email)
     {
-        return $this->setField(self::FIELD_EMAIL, $email);
+        return $this->setUserField(self::FIELD_EMAIL, $email);
     }
     /**
      * Set the a field on the current user.
      *
-     * @param string $key
-     * @param $value
+     * @param string $key The key on the user.
+     * @param string|int|bool|array|null $value The value to set. This must be a basic type that can be JSON encoded.
      * @return $this
      */
-    public function setField(string $key, $value)
+    public function setUserField(string $key, $value)
     {
         $this->user[$key] = $value;
         return $this;
@@ -270,7 +287,7 @@ class JsConnect
      */
     public function setName(string $name)
     {
-        return $this->setField(self::FIELD_NAME, $name);
+        return $this->setUserField(self::FIELD_NAME, $name);
     }
     /**
      * Set the current user's avatar.
@@ -280,7 +297,7 @@ class JsConnect
      */
     public function setPhotoURL(string $photo)
     {
-        return $this->setField(self::FIELD_PHOTO, $photo);
+        return $this->setUserField(self::FIELD_PHOTO, $photo);
     }
     /**
      * Set the current user's unique ID.
@@ -290,16 +307,17 @@ class JsConnect
      */
     public function setUniqueID(string $id)
     {
-        return $this->setField(self::FIELD_UNIQUE_ID, $id);
+        return $this->setUserField(self::FIELD_UNIQUE_ID, $id);
     }
     /**
      * Handle the authentication request and redirect back to Vanilla.
      *
-     * @param string $jwt
+     * @param array $query
      */
-    public function handleRequest(string $jwt)
+    public function handleRequest(array $query) : void
     {
         try {
+            $jwt = static::validateFieldExists(self::FIELD_JWT, $query, 'querystring');
             $location = $this->generateResponseLocation($jwt);
             $this->redirect($location);
         } catch (Exception $ex) {
@@ -322,6 +340,13 @@ class JsConnect
         $location = $request[self::FIELD_REDIRECT_URL] . '#' . http_build_query(['jwt' => $response]);
         return $location;
     }
+    /**
+     * Set the credentials that will be used to sign requests.
+     *
+     * @param string $clientID
+     * @param string $secret
+     * @return $this
+     */
     public function setSigningCredentials(string $clientID, string $secret)
     {
         $this->keys[$clientID] = $secret;
@@ -346,15 +371,25 @@ class JsConnect
      */
     protected function jwtDecode(string $jwt) : array
     {
+        /**
+         * @psalm-suppress InvalidArgument
+         */
         $payload = JWT::decode($jwt, $this->keys, self::ALLOWED_ALGORITHMS);
         $payload = $this->stdClassToArray($payload);
         return $payload;
     }
+    /**
+     * Convert an object to an array, recursively.
+     *
+     * @param array|object $o
+     * @return array
+     */
     protected function stdClassToArray($o) : array
     {
-        if (is_scalar($o)) {
+        if (!is_array($o) && !$o instanceof \stdClass) {
             throw new \UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
         }
+        $o = (array) $o;
         $r = [];
         foreach ($o as $key => $value) {
             if (is_array($value) || is_object($value)) {
@@ -398,9 +433,10 @@ class JsConnect
     /**
      * @param string $location
      */
-    protected function redirect(string $location)
+    protected function redirect(string $location) : void
     {
         header("Location: {$location}", true, 302);
+        die;
     }
     public function getUser() : array
     {
@@ -432,13 +468,14 @@ class JsConnect
      * @param mixed $collection The collection to look at.
      * @param string $collectionName The name of the collection.
      * @param bool $validateEmpty If true, make sure the value is also not empty.
+     * @return mixed Returns the field value if there are no errors.
      * @throws FieldNotFoundException
      * @throws InvalidValueException
      */
     protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true)
     {
         if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
-            throw new InvalidValueException("The payload is not a valid array.", 400);
+            throw new InvalidValueException("The payload is not a valid array.");
         }
         if (!isset($collection[$field])) {
             throw new FieldNotFoundException($field, $collectionName);
@@ -446,6 +483,7 @@ class JsConnect
         if ($validateEmpty && empty($collection[$field])) {
             throw new InvalidValueException("Field cannot be empty: {$collectionName}[{$field}]");
         }
+        return $collection[$field];
     }
 }
 }

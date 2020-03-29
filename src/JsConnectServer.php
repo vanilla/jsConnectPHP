@@ -8,7 +8,6 @@
 namespace Vanilla\JsConnect;
 
 use Firebase\JWT\JWT;
-use Vanilla\JsConnect\Exceptions\FieldNotFoundException;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
 class JsConnectServer extends JsConnect {
@@ -28,9 +27,11 @@ class JsConnectServer extends JsConnect {
      * Set the keystore that is used for validating and signing JWTs.
      *
      * @param \ArrayAccess $keystore
+     * @return $this
      */
     public function setKeyStore(\ArrayAccess $keystore) {
         $this->keys = $keystore;
+        return $this;
     }
 
     /**
@@ -58,22 +59,26 @@ class JsConnectServer extends JsConnect {
         $payload = $this->jwtDecode($jwt);
         $cookie = $this->jwtDecode($cookieJWT);
 
-        static::validateFieldExists(static::FIELD_USER, $payload);
-        static::validateFieldExists(static::FIELD_STATE, $payload);
-        static::validateFieldExists(static::FIELD_NONCE, $cookie, 'cookie');
+        $user = static::validateFieldExists(static::FIELD_USER, $payload);
+        $state = static::validateFieldExists(static::FIELD_STATE, $payload);
+        $cookieNonce = static::validateFieldExists(static::FIELD_NONCE, $cookie, 'cookie');
+        $stateNonce = static::validateFieldExists(static::FIELD_NONCE, $state, 'state');
 
-        $user = $payload[static::FIELD_USER];
-        $state = $payload[static::FIELD_STATE];
-
-        static::validateFieldExists(static::FIELD_NONCE, $state, 'state');
-        if (!hash_equals($cookie[static::FIELD_NONCE], $state[static::FIELD_NONCE])) {
+        if (!hash_equals($cookieNonce, $stateNonce)) {
             throw new InvalidValueException("The response nonce is invalid.");
         }
 
         return [$user, $state];
     }
 
-    public function addSigningCredentials(string $clientID, string $secret) {
+    /**
+     * Add a new key/secret pair that can be used to verify signatures.
+     *
+     * @param string $clientID
+     * @param string $secret
+     * @return $this
+     */
+    public function addKey(string $clientID, string $secret) {
         $this->keys[$clientID] = $secret;
         return $this;
     }
