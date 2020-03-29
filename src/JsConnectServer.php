@@ -55,7 +55,19 @@ class JsConnectServer extends JsConnect {
         return [$requestUrl, $cookie];
     }
 
-    public function validateResponse(string $jwt, string $cookieJWT): array {
+    /**
+     * Validate an SSO response.
+     *
+     * @param ?string $jwt The JWT to validate.
+     * @param ?string $cookieJWT The cookie that was set using `JsConnectServer::generateRequest()`.
+     * @return array Returns an array in the form: `[$user, $state]`.
+     * @throws Exceptions\FieldNotFoundException
+     * @throws InvalidValueException
+     */
+    public function validateResponse(?string $jwt, ?string $cookieJWT): array {
+        static::validateNotEmpty($jwt, 'SSO token');
+        static::validateNotEmpty($cookieJWT, 'State cookie');
+
         $payload = $this->jwtDecode($jwt);
         $cookie = $this->jwtDecode($cookieJWT);
 

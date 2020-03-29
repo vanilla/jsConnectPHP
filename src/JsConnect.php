@@ -291,7 +291,7 @@ class JsConnect {
      */
     protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
         if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
-            throw new InvalidValueException("The payload is not a valid array.");
+            throw new InvalidValueException("Invalid array: $collectionName");
         }
 
         if (!isset($collection[$field])) {
@@ -303,5 +303,21 @@ class JsConnect {
         }
 
         return $collection[$field];
+    }
+
+    /**
+     * Validate a value that cannot be empty.
+     *
+     * @param mixed $value The value to test.
+     * @param string $valueName The name of the value for the exception message.
+     * @throws InvalidValueException
+     */
+    protected static function validateNotEmpty($value, string $valueName): void {
+        if ($value === null) {
+            throw new InvalidValueException("$valueName is required.");
+        }
+        if (empty($value)) {
+            throw new InvalidValueException("$valueName cannot be empty.");
+        }
     }
 }
