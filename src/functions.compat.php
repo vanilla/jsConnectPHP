@@ -10,9 +10,6 @@
 
 use Vanilla\JsConnect\JsConnectJSONP;
 
-define('JS_CONNECT_VERSION', '2');
-define('JS_TIMEOUT', 24 * 60);
-
 function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
     JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
 }

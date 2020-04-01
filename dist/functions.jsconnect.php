@@ -220,8 +220,7 @@ use Vanilla\JsConnect\Exceptions\InvalidValueException;
 /**
  * Handles the jsConnect protocol v3.x.
  */
-class JsConnect
-{
+class JsConnect {
     const VERSION = 'php:3';
     const FIELD_UNIQUE_ID = 'id';
     const FIELD_PHOTO = 'photo';
@@ -974,9 +973,6 @@ class SignatureInvalidException extends \UnexpectedValueException
  */
 
 use Vanilla\JsConnect\JsConnectJSONP;
-
-define('JS_CONNECT_VERSION', '2');
-define('JS_TIMEOUT', 24 * 60);
 
 function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
     JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
