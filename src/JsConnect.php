@@ -50,6 +50,11 @@ class JsConnect {
     protected $user = [];
 
     /**
+     * @var bool
+     */
+    protected $guest = false;
+
+    /**
      * @var string
      */
     protected $signingAlgorithm;
@@ -60,6 +65,22 @@ class JsConnect {
     public function __construct() {
         $this->keys = new \ArrayObject();
         $this->setSigningAlgorithm('HS256');
+    }
+
+    /**
+     * Validate a value that cannot be empty.
+     *
+     * @param mixed $value The value to test.
+     * @param string $valueName The name of the value for the exception message.
+     * @throws InvalidValueException
+     */
+    protected static function validateNotEmpty($value, string $valueName): void {
+        if ($value === null) {
+            throw new InvalidValueException("$valueName is required.");
+        }
+        if (empty($value)) {
+            throw new InvalidValueException("$valueName cannot be empty.");
+        }
     }
 
     /**
@@ -130,6 +151,33 @@ class JsConnect {
     }
 
     /**
+     * Validate that a field exists in a collection.
+     *
+     * @param string $field The name of the field to validate.
+     * @param mixed $collection The collection to look at.
+     * @param string $collectionName The name of the collection.
+     * @param bool $validateEmpty If true, make sure the value is also not empty.
+     * @return mixed Returns the field value if there are no errors.
+     * @throws FieldNotFoundException
+     * @throws InvalidValueException
+     */
+    protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
+        if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
+            throw new InvalidValueException("Invalid array: $collectionName");
+        }
+
+        if (!isset($collection[$field])) {
+            throw new FieldNotFoundException($field, $collectionName);
+        }
+
+        if ($validateEmpty && empty($collection[$field])) {
+            throw new InvalidValueException("Field cannot be empty: {$collectionName}[{$field}]");
+        }
+
+        return $collection[$field];
+    }
+
+    /**
      * Generate the location for an SSO redirect.
      *
      * @param string $requestJWT
@@ -139,46 +187,22 @@ class JsConnect {
         // Validate the request token.
         $request = $this->jwtDecode($requestJWT);
 
-        // Generate the response token.
-        $data = [
-            self::FIELD_USER => $this->user,
-            self::FIELD_STATE => $request[self::FIELD_STATE] ?? [],
-        ];
+        if ($this->isGuest()) {
+            $data = [
+                self::FIELD_USER => new \stdClass(),
+                self::FIELD_STATE => $request[self::FIELD_STATE] ?? [],
+            ];
+        } else {
+            // Generate the response token.
+            $data = [
+                self::FIELD_USER => $this->user,
+                self::FIELD_STATE => $request[self::FIELD_STATE] ?? [],
+            ];
+        }
         $response = $this->jwtEncode($data);
 
         $location = $request[self::FIELD_REDIRECT_URL] . '#' . http_build_query(['jwt' => $response]);
         return $location;
-    }
-
-    /**
-     * Set the credentials that will be used to sign requests.
-     *
-     * @param string $clientID
-     * @param string $secret
-     * @return $this
-     */
-    public function setSigningCredentials(string $clientID, string $secret) {
-        $this->keys[$clientID] = $secret;
-        $this->signingClientID = $clientID;
-        return $this;
-    }
-
-    /**
-     * Wrap a payload in a JWT.
-     *
-     * @param array $payload
-     * @return string
-     */
-    protected function jwtEncode(array $payload): string {
-        $payload += [
-            'v' => self::VERSION,
-            'exp' => $this->getTimestamp() + self::TIMEOUT,
-        ];
-
-        $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [
-            'kid' => $this->getSigningClientID(),
-        ]);
-        return $jwt;
     }
 
     /**
@@ -218,6 +242,44 @@ class JsConnect {
     }
 
     /**
+     * Whether or not the user is signed in.
+     *
+     * @return bool
+     */
+    public function isGuest(): bool {
+        return $this->guest;
+    }
+
+    /**
+     * Set whether or not the user is signed in.
+     *
+     * @param bool $isGuest
+     * @return $this
+     */
+    public function setGuest(bool $isGuest) {
+        $this->guest = $isGuest;
+        return $this;
+    }
+
+    /**
+     * Wrap a payload in a JWT.
+     *
+     * @param array $payload
+     * @return string
+     */
+    protected function jwtEncode(array $payload): string {
+        $payload += [
+            'v' => self::VERSION,
+            'exp' => $this->getTimestamp() + self::TIMEOUT,
+        ];
+
+        $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [
+            'kid' => $this->getSigningClientID(),
+        ]);
+        return $jwt;
+    }
+
+    /**
      * Get the current timestamp.
      *
      * This time is used for signing and verifying tokens.
@@ -230,33 +292,12 @@ class JsConnect {
     }
 
     /**
-     * Get the client ID that is used to sign JWTs.
-     *
-     * @return string
-     */
-    protected function getSigningClientID(): string {
-        return $this->signingClientID;
-    }
-
-    /**
      * Get the secret that is used to sign JWTs.
      *
      * @return string
      */
     protected function getSigningSecret(): string {
         return $this->keys[$this->signingClientID];
-    }
-
-    /**
-     * @param string $location
-     */
-    protected function redirect(string $location): void {
-        header("Location: $location", true, 302);
-        die();
-    }
-
-    public function getUser(): array {
-        return $this->user;
     }
 
     /**
@@ -279,45 +320,36 @@ class JsConnect {
     }
 
     /**
-     * Validate that a field exists in a collection.
+     * Get the client ID that is used to sign JWTs.
      *
-     * @param string $field The name of the field to validate.
-     * @param mixed $collection The collection to look at.
-     * @param string $collectionName The name of the collection.
-     * @param bool $validateEmpty If true, make sure the value is also not empty.
-     * @return mixed Returns the field value if there are no errors.
-     * @throws FieldNotFoundException
-     * @throws InvalidValueException
+     * @return string
      */
-    protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
-        if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
-            throw new InvalidValueException("Invalid array: $collectionName");
-        }
-
-        if (!isset($collection[$field])) {
-            throw new FieldNotFoundException($field, $collectionName);
-        }
-
-        if ($validateEmpty && empty($collection[$field])) {
-            throw new InvalidValueException("Field cannot be empty: {$collectionName}[{$field}]");
-        }
-
-        return $collection[$field];
+    protected function getSigningClientID(): string {
+        return $this->signingClientID;
     }
 
     /**
-     * Validate a value that cannot be empty.
-     *
-     * @param mixed $value The value to test.
-     * @param string $valueName The name of the value for the exception message.
-     * @throws InvalidValueException
+     * @param string $location
      */
-    protected static function validateNotEmpty($value, string $valueName): void {
-        if ($value === null) {
-            throw new InvalidValueException("$valueName is required.");
-        }
-        if (empty($value)) {
-            throw new InvalidValueException("$valueName cannot be empty.");
-        }
+    protected function redirect(string $location): void {
+        header("Location: $location", true, 302);
+        die();
+    }
+
+    /**
+     * Set the credentials that will be used to sign requests.
+     *
+     * @param string $clientID
+     * @param string $secret
+     * @return $this
+     */
+    public function setSigningCredentials(string $clientID, string $secret) {
+        $this->keys[$clientID] = $secret;
+        $this->signingClientID = $clientID;
+        return $this;
+    }
+
+    public function getUser(): array {
+        return $this->user;
     }
 }

@@ -71,7 +71,7 @@ class JsConnectServer extends JsConnect {
         $payload = $this->jwtDecode($jwt);
         $cookie = $this->jwtDecode($cookieJWT);
 
-        $user = static::validateFieldExists(static::FIELD_USER, $payload);
+        $user = static::validateFieldExists(static::FIELD_USER, $payload, 'payload', false) ?: [];
         $state = static::validateFieldExists(static::FIELD_STATE, $payload);
         $cookieNonce = static::validateFieldExists(static::FIELD_NONCE, $cookie, 'cookie');
         $stateNonce = static::validateFieldExists(static::FIELD_NONCE, $state, 'state');

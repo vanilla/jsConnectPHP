@@ -43,6 +43,23 @@ class JsConnectServerTest extends TestCase {
         $this->assertSame($this->jsc->getUser(), $user);
     }
 
+    public function testGuestHappyFlow() {
+        // 1. Vanilla generate the request.
+        list($requestUrl, $cookie) = $this->jsc->generateRequest();
+
+        // 2. The client authenticates the request and generates a response.
+        $this->jsc->setGuest(true);
+        $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl));
+
+        // 3. Vanilla verifies the response.
+        list($user, $state) = $this->jsc->validateResponse(
+            $this->jwtFromUrl($responseLocation, PHP_URL_FRAGMENT),
+            $cookie
+        );
+
+        $this->assertEmpty($user);
+    }
+
     public function testInvalidNonce() {
         // 1. Vanilla generate the request.
         list($requestUrl1, $cookie1) = $this->jsc->generateRequest();

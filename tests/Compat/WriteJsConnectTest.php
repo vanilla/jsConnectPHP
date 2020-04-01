@@ -8,6 +8,7 @@
 namespace Vanilla\JsConnect\Tests\Compat;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\JsConnect\JsConnectJSONP;
 
 /**
  * Unit tests signJsConnect
@@ -130,7 +131,7 @@ class WriteJsConnectTest extends TestCase {
 
         // Timed Out timestamp
         $data['timedOutTimestamp'] = $fnGenerateAlteratedData(
-            $timestamp, ($timestamp - (JS_TIMEOUT + 1)), array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.')
+            $timestamp, ($timestamp - (JsConnectJSONP::TIMEOUT + 1)), array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.')
         );
 
         // Bad client_id
