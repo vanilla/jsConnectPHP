@@ -12,6 +12,7 @@ use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
 class JsConnectServer extends JsConnect {
     const FIELD_NONCE = 'n';
+    const FIELD_TARGET = 't';
 
     /**
      * @var string
@@ -96,6 +97,10 @@ class JsConnectServer extends JsConnect {
     }
 
     /**
+     * The URL on the client's site that will run the jsConnect client library.
+     *
+     * This URL is analogous to OAuth's authenticate URL.
+     *
      * @return string
      */
     public function getAuthenticateUrl(): string {
@@ -103,6 +108,8 @@ class JsConnectServer extends JsConnect {
     }
 
     /**
+     * Set the URL on the client's site that will run the jsConnect client library.
+     *
      * @param string $authenticateUrl
      * @return $this
      */
@@ -112,6 +119,8 @@ class JsConnectServer extends JsConnect {
     }
 
     /**
+     * The URL on Vanilla' that will process the client's authentication response.
+     *
      * @return string
      */
     public function getRedirectUrl(): string {
