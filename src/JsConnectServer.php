@@ -51,7 +51,7 @@ class JsConnectServer extends JsConnect {
             ],
             'rurl' => $this->getRedirectUrl(),
         ]);
-        $requestUrl = $this->getAuthenticateUrl().'?'.http_build_query(['jwt' => $requestJWT]);
+        $requestUrl = $this->getAuthenticateUrlWithSeparator().http_build_query(['jwt' => $requestJWT]);
 
         return [$requestUrl, $cookie];
     }
@@ -105,6 +105,15 @@ class JsConnectServer extends JsConnect {
      */
     public function getAuthenticateUrl(): string {
         return $this->authenticateUrl;
+    }
+
+    /**
+     * Get the authenticate URL with the proper query string separator.
+     *
+     * @return string
+     */
+    protected function getAuthenticateUrlWithSeparator(): string {
+        return $this->authenticateUrl.(strpos($this->authenticateUrl, '?') === false ? '?' : '&');
     }
 
     /**
