@@ -61,7 +61,7 @@ class JsConnectServer extends JsConnect {
      *
      * @param ?string $jwt The JWT to validate.
      * @param ?string $cookieJWT The cookie that was set using `JsConnectServer::generateRequest()`.
-     * @return array Returns an array in the form: `[$user, $state]`.
+     * @return array Returns an array in the form: `[$user, $state, $fullPayload]`.
      * @throws Exceptions\FieldNotFoundException
      * @throws InvalidValueException
      */
@@ -81,7 +81,7 @@ class JsConnectServer extends JsConnect {
             throw new InvalidValueException("The response nonce is invalid.");
         }
 
-        return [$user, $state];
+        return [$user, $state, $payload];
     }
 
     /**
