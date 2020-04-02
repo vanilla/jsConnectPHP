@@ -233,6 +233,7 @@ class JsConnect
     const FIELD_STATE = 'st';
     const FIELD_USER = 'u';
     const FIELD_REDIRECT_URL = 'rurl';
+    const FIELD_CLIENT_ID = 'kid';
     /**
      * @var \ArrayAccess
      */
@@ -452,7 +453,7 @@ class JsConnect
     protected function jwtEncode(array $payload) : string
     {
         $payload += ['v' => self::VERSION, 'exp' => $this->getTimestamp() + self::TIMEOUT];
-        $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, ['kid' => $this->getSigningClientID()]);
+        $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [self::FIELD_CLIENT_ID => $this->getSigningClientID()]);
         return $jwt;
     }
     /**
@@ -528,6 +529,27 @@ class JsConnect
     public function getUser() : array
     {
         return $this->user;
+    }
+    /**
+     * Returns a JWT header.
+     *
+     * @param string $jwt
+     *
+     * @return array|null
+     */
+    public function getJWTHeader($jwt) : array
+    {
+        #todo getting the header data here (f.e. to get the "kid") -- create pull request to get header data back from JWT
+        #code copied from JWT::decode
+        $tks = explode('.', $jwt);
+        if (count($tks) != 3) {
+            throw new \UnexpectedValueException('Wrong number of segments');
+        }
+        list($headb64, $bodyb64, $cryptob64) = $tks;
+        if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))) {
+            throw new \UnexpectedValueException('Invalid header encoding');
+        }
+        return json_decode(json_encode($header), true);
     }
 }
 }
