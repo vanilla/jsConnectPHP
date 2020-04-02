@@ -31,10 +31,13 @@ class JsConnect {
     const ALLOWED_ALGORITHMS = [
         'ES256', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512'
     ];
+
     const FIELD_STATE = 'st';
     const FIELD_USER = 'u';
+
     const FIELD_REDIRECT_URL = 'rurl';
     const FIELD_CLIENT_ID = 'kid';
+    const FIELD_TARGET = 't';
 
     /**
      * @var \ArrayAccess

@@ -244,6 +244,7 @@ class JsConnect
     const FIELD_USER = 'u';
     const FIELD_REDIRECT_URL = 'rurl';
     const FIELD_CLIENT_ID = 'kid';
+    const FIELD_TARGET = 't';
     /**
      * @var \ArrayAccess
      */

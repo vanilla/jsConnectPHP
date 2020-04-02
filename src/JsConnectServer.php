@@ -12,7 +12,6 @@ use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
 class JsConnectServer extends JsConnect {
     const FIELD_NONCE = 'n';
-    const FIELD_TARGET = 't';
 
     /**
      * @var string
