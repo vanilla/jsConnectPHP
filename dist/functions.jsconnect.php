@@ -30,13 +30,22 @@ final class JsConnectJSONP
             self::writeJSONP($user, $request, $clientID, $secret, $secure);
         }
     }
+    /**
+     * This is a backwards compatible method to help migrate jsConnect to the KWT protocol.
+     *
+     * @param array $user
+     * @param array $query
+     * @param string $clientID
+     * @param string $secret
+     */
     protected static function writeJWT(array $user, array $query, string $clientID, string $secret) : void
     {
         $jsc = new JsConnect();
         $jsc->setSigningCredentials($clientID, $secret);
         foreach ($user as $key => $value) {
+            $key = strtolower($key);
             if (isset(self::FIELD_MAP[$key])) {
-                $key = $user[self::FIELD_MAP[$key]];
+                $key = self::FIELD_MAP[$key];
             }
             $jsc->setUserField($key, $value);
         }
