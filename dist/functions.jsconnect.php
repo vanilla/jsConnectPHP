@@ -537,10 +537,8 @@ class JsConnect
      *
      * @return array|null
      */
-    public function getJWTHeader($jwt) : array
+    public static final function decodeJWTHeader(string $jwt) : ?array
     {
-        #todo getting the header data here (f.e. to get the "kid") -- create pull request to get header data back from JWT
-        #code copied from JWT::decode
         $tks = explode('.', $jwt);
         if (count($tks) != 3) {
             throw new \UnexpectedValueException('Wrong number of segments');
