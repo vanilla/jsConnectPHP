@@ -236,6 +236,7 @@ class JsConnect
     const FIELD_PHOTO = 'photo';
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
+    const FIELD_ROLES = 'roles';
     const FIELD_JWT = 'jwt';
     const TIMEOUT = 10 * 60;
     const ALLOWED_ALGORITHMS = ['ES256', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512'];
@@ -461,7 +462,7 @@ class JsConnect
      */
     protected function jwtEncode(array $payload) : string
     {
-        $payload += ['v' => self::VERSION, 'exp' => $this->getTimestamp() + self::TIMEOUT];
+        $payload += ['v' => self::VERSION, 'iat' => $this->getTimestamp(), 'exp' => $this->getTimestamp() + self::TIMEOUT];
         $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [self::FIELD_CLIENT_ID => $this->getSigningClientID()]);
         return $jwt;
     }
@@ -538,6 +539,17 @@ class JsConnect
     public function getUser() : array
     {
         return $this->user;
+    }
+    /**
+     * Set the roles on the user.
+     *
+     * @param array $roles
+     * @return $this
+     */
+    public function setRoles(array $roles)
+    {
+        $this->setUserField(self::FIELD_ROLES, $roles);
+        return $this;
     }
     /**
      * Returns a JWT header.

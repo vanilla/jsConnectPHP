@@ -23,6 +23,7 @@ class JsConnect {
     const FIELD_PHOTO = 'photo';
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
+    const FIELD_ROLES = 'roles';
     const FIELD_JWT = 'jwt';
 
     const TIMEOUT = 10 * 60;
@@ -271,6 +272,7 @@ class JsConnect {
     protected function jwtEncode(array $payload): string {
         $payload += [
             'v' => self::VERSION,
+            'iat' => $this->getTimestamp(),
             'exp' => $this->getTimestamp() + self::TIMEOUT,
         ];
 
@@ -352,6 +354,17 @@ class JsConnect {
 
     public function getUser(): array {
         return $this->user;
+    }
+
+    /**
+     * Set the roles on the user.
+     *
+     * @param array $roles
+     * @return $this
+     */
+    public function setRoles(array $roles) {
+        $this->setUserField(self::FIELD_ROLES, $roles);
+        return $this;
     }
 
     /**
