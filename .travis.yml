@@ -1,15 +1,18 @@
 language: php
 
 php:
-    - 7.1
-    - 7.2
-    - 7.3
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
 
 matrix:
-    fast_finish: true
+  fast_finish: true
 
 install:
-    - composer self-update
-    - composer require "phpunit/phpunit=~7.5"
+  - composer self-update
+  - composer install
 
-script: ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+script:
+  - ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+  - ./vendor/bin/psalm

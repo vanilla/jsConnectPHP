@@ -1,16 +1,19 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
-namespace JsConnect\Tests;
+namespace Vanilla\JsConnect\Tests\Compat;
+
+use PHPUnit\Framework\TestCase;
+use Vanilla\JsConnect\JsConnectJSONP;
 
 /**
  * Unit tests signJsConnect
  */
-class WriteJsConnectTest extends \PHPUnit\Framework\TestCase {
+class WriteJsConnectTest extends TestCase {
 
     /**
      * @param $user
@@ -128,7 +131,7 @@ class WriteJsConnectTest extends \PHPUnit\Framework\TestCase {
 
         // Timed Out timestamp
         $data['timedOutTimestamp'] = $fnGenerateAlteratedData(
-            $timestamp, ($timestamp - (JS_TIMEOUT + 1)), array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.')
+            $timestamp, ($timestamp - (JsConnectJSONP::TIMEOUT + 1)), array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.')
         );
 
         // Bad client_id
