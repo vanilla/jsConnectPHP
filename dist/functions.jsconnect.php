@@ -11,7 +11,7 @@ final class JsConnectJSONP
     /**
      * Write the jsConnect string for single sign on.
      *
-     * @param array $user An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
+     * @param array $user An array containing information about the currently signed on user. If no user is signed in, this should be empty.
      * @param array $request An array of the $_GET request.
      * @param string $clientID The string client ID that you set up in the jsConnect settings page.
      * @param string $secret The string secret that you set up in the jsConnect settings page.
@@ -52,11 +52,12 @@ final class JsConnectJSONP
         $jsc->handleRequest($query);
     }
     /**
-     * @param $user
-     * @param $request
-     * @param $clientID
-     * @param $secret
-     * @param $secure
+     * Write the JSONP (v2) protocol response.
+     *
+     * @param array $user
+     * @param array $request
+     * @param string $clientID
+     * @param string $secret
      * @param bool|string|null $secure
      */
     protected static function writeJSONP(array $user, array $request, string $clientID, string $secret, $secure) : void
@@ -85,6 +86,7 @@ final class JsConnectJSONP
             } elseif (!isset($request['sig'])) {
                 $error = array('error' => 'invalid_request', 'message' => 'Missing the sig parameter.');
             } elseif (abs($request['timestamp'] - self::timestamp()) > self::TIMEOUT) {
+                // Make sure the timestamp hasn't timeout
                 $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
             } elseif (!isset($request['nonce'])) {
                 $error = array('error' => 'invalid_request', 'message' => 'Missing the nonce parameter.');
@@ -125,7 +127,7 @@ final class JsConnectJSONP
         echo $content;
     }
     /**
-     *
+     * Get the current timestamp.
      *
      * @return int
      */
@@ -157,12 +159,13 @@ final class JsConnectJSONP
         }
     }
     /**
-     * @param $data
-     * @param $clientID
-     * @param $secret
+     * Sign a jsConnect array.
+     *
+     * @param array $data
+     * @param string $clientID
+     * @param string $secret
      * @param string|bool $hashType
      * @param bool $returnData
-     * @param array $data
      *
      * @return array|string
      */
@@ -278,7 +281,7 @@ class JsConnect
      *
      * @param mixed $value The value to test.
      * @param string $valueName The name of the value for the exception message.
-     * @throws InvalidValueException
+     * @throws InvalidValueException Throws an exception when the value is empty.
      */
     protected static function validateNotEmpty($value, string $valueName) : void
     {
@@ -364,8 +367,8 @@ class JsConnect
      * @param string $collectionName The name of the collection.
      * @param bool $validateEmpty If true, make sure the value is also not empty.
      * @return mixed Returns the field value if there are no errors.
-     * @throws FieldNotFoundException
-     * @throws InvalidValueException
+     * @throws FieldNotFoundException Throws an exception when the field is not in the array.
+     * @throws InvalidValueException Throws an exception when the collection isn't an array or the value is empty.
      */
     protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true)
     {
@@ -422,7 +425,7 @@ class JsConnect
     protected function stdClassToArray($o) : array
     {
         if (!is_array($o) && !$o instanceof \stdClass) {
-            throw new \UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
+            throw new UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
         }
         $o = (array) $o;
         $r = [];
@@ -489,6 +492,8 @@ class JsConnect
         return $this->keys[$this->signingClientID];
     }
     /**
+     * Get the algorithm used to sign tokens.
+     *
      * @return string
      */
     public function getSigningAlgorithm() : string
@@ -496,6 +501,8 @@ class JsConnect
         return $this->signingAlgorithm;
     }
     /**
+     * Set the algorithm used to sign tokens.
+     *
      * @param string $signingAlgorithm
      * @return $this
      */
@@ -517,6 +524,8 @@ class JsConnect
         return $this->signingClientID;
     }
     /**
+     * Redirect to a new location.
+     *
      * @param string $location
      */
     protected function redirect(string $location) : void
@@ -563,13 +572,59 @@ class JsConnect
     {
         $tks = explode('.', $jwt);
         if (count($tks) != 3) {
-            throw new \UnexpectedValueException('Wrong number of segments');
+            throw new UnexpectedValueException('Wrong number of segments');
         }
-        list($headb64, $bodyb64, $cryptob64) = $tks;
+        list($headb64) = $tks;
         if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))) {
-            throw new \UnexpectedValueException('Invalid header encoding');
+            throw new UnexpectedValueException('Invalid header encoding');
         }
         return json_decode(json_encode($header), true);
+    }
+}
+}
+
+namespace Vanilla\JsConnect\Exceptions {
+/**
+ * The base class for all JsConnect exceptions.
+ */
+class JsConnectException extends \Exception
+{
+}
+}
+
+namespace Vanilla\JsConnect\Exceptions {
+/**
+ * An exception that represents a missing field in a request or response.
+ */
+class FieldNotFoundException extends JsConnectException
+{
+    /**
+     * FieldNotFoundException constructor.
+     *
+     * @param string $field
+     * @param string $collection
+     */
+    public function __construct(string $field, string $collection = 'payload')
+    {
+        parent::__construct("Missing field: {$collection}[{$field}]", 404);
+    }
+}
+}
+
+namespace Vanilla\JsConnect\Exceptions {
+/**
+ * An exception that represents a value that is not the correct type or expected value.
+ */
+class InvalidValueException extends JsConnectException
+{
+    /**
+     * InvalidValueException constructor.
+     *
+     * @param string $message
+     */
+    public function __construct(string $message = "")
+    {
+        parent::__construct($message, 400);
     }
 }
 }

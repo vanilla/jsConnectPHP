@@ -77,7 +77,7 @@ class JsConnect {
      *
      * @param mixed $value The value to test.
      * @param string $valueName The name of the value for the exception message.
-     * @throws InvalidValueException
+     * @throws InvalidValueException Throws an exception when the value is empty.
      */
     protected static function validateNotEmpty($value, string $valueName): void {
         if ($value === null) {
@@ -163,8 +163,8 @@ class JsConnect {
      * @param string $collectionName The name of the collection.
      * @param bool $validateEmpty If true, make sure the value is also not empty.
      * @return mixed Returns the field value if there are no errors.
-     * @throws FieldNotFoundException
-     * @throws InvalidValueException
+     * @throws FieldNotFoundException Throws an exception when the field is not in the array.
+     * @throws InvalidValueException Throws an exception when the collection isn't an array or the value is empty.
      */
     protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
         if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
@@ -231,7 +231,7 @@ class JsConnect {
      */
     protected function stdClassToArray($o): array {
         if (!is_array($o) && !($o instanceof \stdClass)) {
-            throw new \UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
+            throw new UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
         }
 
         $o = (array)$o;
@@ -307,6 +307,8 @@ class JsConnect {
     }
 
     /**
+     * Get the algorithm used to sign tokens.
+     *
      * @return string
      */
     public function getSigningAlgorithm(): string {
@@ -314,6 +316,8 @@ class JsConnect {
     }
 
     /**
+     * Set the algorithm used to sign tokens.
+     *
      * @param string $signingAlgorithm
      * @return $this
      */
@@ -335,6 +339,8 @@ class JsConnect {
     }
 
     /**
+     * Redirect to a new location.
+     *
      * @param string $location
      */
     protected function redirect(string $location): void {
@@ -380,11 +386,11 @@ class JsConnect {
     final public static function decodeJWTHeader(string $jwt): ?array {
         $tks = explode('.', $jwt);
         if (count($tks) != 3) {
-            throw new \UnexpectedValueException('Wrong number of segments');
+            throw new UnexpectedValueException('Wrong number of segments');
         }
-        list($headb64, $bodyb64, $cryptob64) = $tks;
+        list($headb64) = $tks;
         if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))) {
-            throw new \UnexpectedValueException('Invalid header encoding');
+            throw new UnexpectedValueException('Invalid header encoding');
         }
         return json_decode(json_encode($header), true);
     }

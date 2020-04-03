@@ -7,16 +7,21 @@
 
 namespace Vanilla\JsConnect\Tests;
 
-
 use PHPUnit\Framework\TestCase;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
 use Vanilla\JsConnect\JsConnectServer;
 
+/**
+ * Tests for the `JsConnectServer` class.
+ */
 class JsConnectServerTest extends TestCase {
     use JsConnectTestTrait;
 
     private $jsc;
 
+    /**
+     * {@inheritDoc}
+     */
     public function setUp() {
         parent::setUp();
         $this->jsc = new JsConnectServer();
@@ -27,6 +32,9 @@ class JsConnectServerTest extends TestCase {
             ->setRedirectUrl('https://example.com/redirect');
     }
 
+    /**
+     * Test a full SSO flow.
+     */
     public function testBasicHappyFlow() {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
@@ -35,7 +43,7 @@ class JsConnectServerTest extends TestCase {
         $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl));
 
         // 3. Vanilla verifies the response.
-        list($user, $state) = $this->jsc->validateResponse(
+        list($user) = $this->jsc->validateResponse(
             $this->jwtFromUrl($responseLocation, PHP_URL_FRAGMENT),
             $cookie
         );
@@ -43,6 +51,9 @@ class JsConnectServerTest extends TestCase {
         $this->assertSame($this->jsc->getUser(), $user);
     }
 
+    /**
+     * Test a full SSO flow with a signed out user (guest).
+     */
     public function testGuestHappyFlow() {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
@@ -60,6 +71,9 @@ class JsConnectServerTest extends TestCase {
         $this->assertEmpty($user);
     }
 
+    /**
+     * Test an SSO flow that should fail due to an invalid nonce.
+     */
     public function testInvalidNonce() {
         // 1. Vanilla generate the request.
         list($requestUrl1, $cookie1) = $this->jsc->generateRequest();
@@ -77,6 +91,9 @@ class JsConnectServerTest extends TestCase {
         );
     }
 
+    /**
+     * Test an SSO flow that should fail due to a missing cookie.
+     */
     public function testMissingCookie() {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
@@ -87,7 +104,7 @@ class JsConnectServerTest extends TestCase {
         // 3. Vanilla verifies the response.
         $this->expectException(InvalidValueException::class);
         $this->expectExceptionMessage('State cookie cannot be empty.');
-        list($user, $state) = $this->jsc->validateResponse(
+        $this->jsc->validateResponse(
             $this->jwtFromUrl($responseLocation, PHP_URL_FRAGMENT),
             ''
         );

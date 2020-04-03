@@ -22,7 +22,7 @@ final class JsConnectJSONP {
     /**
      * Write the jsConnect string for single sign on.
      *
-     * @param array $user An array containing information about the currently signed on user. If no user is signed in then this should be an empty array.
+     * @param array $user An array containing information about the currently signed on user. If no user is signed in, this should be empty.
      * @param array $request An array of the $_GET request.
      * @param string $clientID The string client ID that you set up in the jsConnect settings page.
      * @param string $secret The string secret that you set up in the jsConnect settings page.
@@ -64,11 +64,12 @@ final class JsConnectJSONP {
     }
 
     /**
-     * @param $user
-     * @param $request
-     * @param $clientID
-     * @param $secret
-     * @param $secure
+     * Write the JSONP (v2) protocol response.
+     *
+     * @param array $user
+     * @param array $request
+     * @param string $clientID
+     * @param string $secret
      * @param bool|string|null $secure
      */
     protected static function writeJSONP(array $user, array $request, string $clientID, string $secret, $secure): void {
@@ -96,8 +97,8 @@ final class JsConnectJSONP {
                 $error = array('error' => 'invalid_request', 'message' => 'The timestamp parameter is missing or invalid.');
             } elseif (!isset($request['sig'])) {
                 $error = array('error' => 'invalid_request', 'message' => 'Missing the sig parameter.');
-            } // Make sure the timestamp hasn't timeout
-            elseif (abs($request['timestamp'] - self::timestamp()) > self::TIMEOUT) {
+            } elseif (abs($request['timestamp'] - self::timestamp()) > self::TIMEOUT) {
+                // Make sure the timestamp hasn't timeout
                 $error = array('error' => 'invalid_request', 'message' => 'The timestamp is invalid.');
             } elseif (!isset($request['nonce'])) {
                 $error = array('error' => 'invalid_request', 'message' => 'Missing the nonce parameter.');
@@ -143,7 +144,7 @@ final class JsConnectJSONP {
     }
 
     /**
-     *
+     * Get the current timestamp.
      *
      * @return int
      */
@@ -176,12 +177,13 @@ final class JsConnectJSONP {
     }
 
     /**
-     * @param $data
-     * @param $clientID
-     * @param $secret
+     * Sign a jsConnect array.
+     *
+     * @param array $data
+     * @param string $clientID
+     * @param string $secret
      * @param string|bool $hashType
      * @param bool $returnData
-     * @param array $data
      *
      * @return array|string
      */
