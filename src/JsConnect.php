@@ -274,7 +274,7 @@ class JsConnect {
      */
     protected function jwtEncode(array $payload): string {
         $payload += [
-            'v' => self::VERSION,
+            'v' => $this->getVersion(),
             'iat' => $this->getTimestamp(),
             'exp' => $this->getTimestamp() + self::TIMEOUT,
         ];
@@ -302,7 +302,7 @@ class JsConnect {
      *
      * @return string
      */
-    protected function getSigningSecret(): string {
+    public function getSigningSecret(): string {
         return $this->keys[$this->signingClientID];
     }
 
@@ -334,7 +334,7 @@ class JsConnect {
      *
      * @return string
      */
-    protected function getSigningClientID(): string {
+    public function getSigningClientID(): string {
         return $this->signingClientID;
     }
 
@@ -393,5 +393,14 @@ class JsConnect {
             throw new UnexpectedValueException('Invalid header encoding');
         }
         return json_decode(json_encode($header), true);
+    }
+
+    /**
+     * Get the version used to sign requests.
+     *
+     * @return string
+     */
+    public function getVersion(): string {
+        return self::VERSION;
     }
 }

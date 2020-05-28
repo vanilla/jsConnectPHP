@@ -466,7 +466,7 @@ class JsConnect
      */
     protected function jwtEncode(array $payload) : string
     {
-        $payload += ['v' => self::VERSION, 'iat' => $this->getTimestamp(), 'exp' => $this->getTimestamp() + self::TIMEOUT];
+        $payload += ['v' => $this->getVersion(), 'iat' => $this->getTimestamp(), 'exp' => $this->getTimestamp() + self::TIMEOUT];
         $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [self::FIELD_CLIENT_ID => $this->getSigningClientID()]);
         return $jwt;
     }
@@ -487,7 +487,7 @@ class JsConnect
      *
      * @return string
      */
-    protected function getSigningSecret() : string
+    public function getSigningSecret() : string
     {
         return $this->keys[$this->signingClientID];
     }
@@ -519,7 +519,7 @@ class JsConnect
      *
      * @return string
      */
-    protected function getSigningClientID() : string
+    public function getSigningClientID() : string
     {
         return $this->signingClientID;
     }
@@ -579,6 +579,15 @@ class JsConnect
             throw new UnexpectedValueException('Invalid header encoding');
         }
         return json_decode(json_encode($header), true);
+    }
+    /**
+     * Get the version used to sign requests.
+     *
+     * @return string
+     */
+    public function getVersion() : string
+    {
+        return self::VERSION;
     }
 }
 }
@@ -1098,28 +1107,31 @@ class SignatureInvalidException extends \UnexpectedValueException
  * @license MIT
  */
 
-use Vanilla\JsConnect\JsConnectJSONP;
+namespace {
 
-function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
-    JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
-}
+    use Vanilla\JsConnect\JsConnectJSONP;
 
-function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
-    return JsConnectJSONP::signJsConnect($data, $clientID, $secret, $hashType, $returnData);
-}
+    function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
+        JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
+    }
 
-function jsHash($string, $secure = true) {
-    return JsConnectJSONP::hash($string, $secure);
-}
+    function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
+        return JsConnectJSONP::signJsConnect($data, $clientID, $secret, $hashType, $returnData);
+    }
 
-function jsTimestamp() {
-    return JsConnectJSONP::timestamp();
-}
+    function jsHash($string, $secure = true) {
+        return JsConnectJSONP::hash($string, $secure);
+    }
 
-function jsSSOString($user, $clientID, $secret) {
-    return JsConnectJSONP::ssoString($user, $clientID, $secret);
-}
+    function jsTimestamp() {
+        return JsConnectJSONP::timestamp();
+    }
 
-function jsConnectContentType(array $request): string {
-    return JsConnectJSONP::contentType($request);
+    function jsSSOString($user, $clientID, $secret) {
+        return JsConnectJSONP::ssoString($user, $clientID, $secret);
+    }
+
+    function jsConnectContentType(array $request): string {
+        return JsConnectJSONP::contentType($request);
+    }
 }

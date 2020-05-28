@@ -1,0 +1,85 @@
+{
+    "bad-secret": {
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiUzRNeEl4cXpRV29kN0R1MERZeGIifSwicnVybCI6Imh0dHBzOlwvXC9leGFtcGxlLmNvbVwvcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.ScZz52cG03ALeVZdS1AGL4qdmmN_3j10GBUeNBgWOqM",
+        "clientID": "foo",
+        "secret": "foo",
+        "version": "test:3",
+        "timestamp": 1577836800,
+        "user": {
+            "id": "id123",
+            "name": "frank",
+            "email": "frank@example.com",
+            "photo": "https://example.com/avatar.jpg",
+            "roles": [
+                1,
+                2
+            ]
+        },
+        "exception": "SignatureInvalidException",
+        "message": "Signature verification failed"
+    },
+    "basic": {
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiX3JkUmtWZWlGbUpnN0twM21lZ0oifSwicnVybCI6Imh0dHBzOlwvXC9leGFtcGxlLmNvbVwvcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.DP-yvIPzq5LcONHhpr-iiKd-RMweke1fpWV9qeafx-U",
+        "clientID": "foo",
+        "secret": "bar",
+        "version": "test:3",
+        "timestamp": 1577836800,
+        "user": {
+            "id": "id123",
+            "name": "frank",
+            "email": "frank@example.com",
+            "photo": "https://example.com/avatar.jpg",
+            "roles": [
+                1,
+                2
+            ]
+        },
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczpcL1wvZXhhbXBsZS5jb21cL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoiX3JkUmtWZWlGbUpnN0twM21lZ0oifSwidiI6InRlc3Q6MyIsImlhdCI6MTU3NzgzNjgwMCwiZXhwIjoxNTc3ODM3NDAwfQ.jT8oXEuNCHqVpjSrns5r7XXEzyH-uLBpiFup0ZK1jiA"
+    },
+    "basic-guest": {
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiRm9JOWxXc3RhR1lGYVJ3RkhibGIifSwicnVybCI6Imh0dHBzOlwvXC9leGFtcGxlLmNvbVwvcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.DnTBDCLmDWIFF_HoVqrGEsROpYLHyB1snhf-1q6rfwA",
+        "clientID": "foo",
+        "secret": "bar",
+        "version": "test:3",
+        "timestamp": 1577836800,
+        "user": {},
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7fSwic3QiOnsibiI6IkZvSTlsV3N0YUdZRmFSd0ZIYmxiIn0sInYiOiJ0ZXN0OjMiLCJpYXQiOjE1Nzc4MzY4MDAsImV4cCI6MTU3NzgzNzQwMH0.LljvbYau0yEQ6IjxS50BE7MLmpBEOpHakf8-O7ciM54"
+    },
+    "basic-state": {
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJ0IjoiXC9mb28iLCJuIjoidFppbUkxX29WaGhRakIxNUxFSkYifSwicnVybCI6Imh0dHBzOlwvXC9leGFtcGxlLmNvbVwvcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.9XvFOLwByT9SjmU6UYMAGV7Qr5B5aVVJztbkQxOH82w",
+        "clientID": "foo",
+        "secret": "bar",
+        "version": "test:3",
+        "timestamp": 1577836800,
+        "user": {
+            "id": "id123",
+            "name": "frank",
+            "email": "frank@example.com",
+            "photo": "https://example.com/avatar.jpg",
+            "roles": [
+                1,
+                2
+            ]
+        },
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczpcL1wvZXhhbXBsZS5jb21cL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJ0IjoiXC9mb28iLCJuIjoidFppbUkxX29WaGhRakIxNUxFSkYifSwidiI6InRlc3Q6MyIsImlhdCI6MTU3NzgzNjgwMCwiZXhwIjoxNTc3ODM3NDAwfQ.vUmE5pIDrXDpjAwIecG9tX9_HEB4iHxz6ryYlwFLywk"
+    },
+    "expired-token": {
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiWWhuMWpfMzVlUGxGWnVxUFRFQTkifSwicnVybCI6Imh0dHBzOlwvXC9leGFtcGxlLmNvbVwvcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.yZ0HI6-Dul6p7dM5P_JcW8QzXq6QFRB0NAK3rDL4ML8",
+        "clientID": "foo",
+        "secret": "bar",
+        "version": "test:3",
+        "timestamp": 1578836800,
+        "user": {
+            "id": "id123",
+            "name": "frank",
+            "email": "frank@example.com",
+            "photo": "https://example.com/avatar.jpg",
+            "roles": [
+                1,
+                2
+            ]
+        },
+        "exception": "ExpiredException",
+        "message": "Expired token"
+    }
+}

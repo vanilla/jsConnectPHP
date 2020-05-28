@@ -8,28 +8,31 @@
  * @license MIT
  */
 
-use Vanilla\JsConnect\JsConnectJSONP;
+namespace {
 
-function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
-    JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
-}
+    use Vanilla\JsConnect\JsConnectJSONP;
 
-function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
-    return JsConnectJSONP::signJsConnect($data, $clientID, $secret, $hashType, $returnData);
-}
+    function writeJsConnect($user, $request, $clientID, $secret, $secure = true) {
+        JsConnectJSONP::writeJsConnect($user, $request, $clientID, $secret, $secure);
+    }
 
-function jsHash($string, $secure = true) {
-    return JsConnectJSONP::hash($string, $secure);
-}
+    function signJsConnect($data, $clientID, $secret, $hashType, $returnData = false) {
+        return JsConnectJSONP::signJsConnect($data, $clientID, $secret, $hashType, $returnData);
+    }
 
-function jsTimestamp() {
-    return JsConnectJSONP::timestamp();
-}
+    function jsHash($string, $secure = true) {
+        return JsConnectJSONP::hash($string, $secure);
+    }
 
-function jsSSOString($user, $clientID, $secret) {
-    return JsConnectJSONP::ssoString($user, $clientID, $secret);
-}
+    function jsTimestamp() {
+        return JsConnectJSONP::timestamp();
+    }
 
-function jsConnectContentType(array $request): string {
-    return JsConnectJSONP::contentType($request);
+    function jsSSOString($user, $clientID, $secret) {
+        return JsConnectJSONP::ssoString($user, $clientID, $secret);
+    }
+
+    function jsConnectContentType(array $request): string {
+        return JsConnectJSONP::contentType($request);
+    }
 }
