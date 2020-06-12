@@ -109,4 +109,26 @@ class JsConnectServerTest extends TestCase {
             ''
         );
     }
+
+    /**
+     * I should be able to re-use my cookie if I pass it back to another generate request.
+     */
+    public function testCookieReuse(): void {
+        list($_, $cookie) = $this->jsc->generateRequest();
+        sleep(1);
+        list($_, $cookie2) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => $cookie]);
+        $this->assertSame($cookie, $cookie2);
+
+        $decoded2 = $this->jsc->jwtDecode($cookie2);
+        $this->assertArrayNotHasKey(JsConnectServer::FIELD_COOKIE, $decoded2, "The cookie should be double encoded.");
+    }
+
+    /**
+     * I should not be able to re-use any old cookie value for JsConnect.
+     */
+    public function testCookieReuseError(): void {
+        $this->expectException(InvalidValueException::class);
+        $this->expectExceptionMessage("Could not use supplied jsConnect SSO token");
+        list($_, $cookie) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => 'cook']);
+    }
 }
