@@ -7,7 +7,6 @@
 
 namespace Vanilla\JsConnect;
 
-use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
