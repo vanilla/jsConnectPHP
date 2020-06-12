@@ -7,11 +7,13 @@
 
 namespace Vanilla\JsConnect;
 
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
 class JsConnectServer extends JsConnect {
     const FIELD_NONCE = 'n';
+    const FIELD_COOKIE = 'cookie';
 
     /**
      * @var string
@@ -41,13 +43,25 @@ class JsConnectServer extends JsConnect {
      * @return array Returns an array in the format `[$requestUrl, $cookie]`.
      */
     public function generateRequest(array $state = []): array {
-        $nonce = JWT::urlsafeB64Encode(openssl_random_pseudo_bytes(15));
-        $cookie = $this->jwtEncode([self::FIELD_NONCE => $nonce]);
+        if (isset($state[self::FIELD_COOKIE])) {
+            // The cookie was already set. Make sure it's one of ours.
+            try {
+                $decodedCookie = $this->jwtDecode($state[self::FIELD_COOKIE]);
+            } catch (\Exception $ex) {
+                throw new InvalidValueException('Could not use supplied jsConnect SSO token: '.$ex->getMessage());
+            }
+            $nonce = self::validateFieldExists(self::FIELD_NONCE, $decodedCookie, 'ssoToken');
+            $cookie = $state[self::FIELD_COOKIE];
+            unset($state[self::FIELD_COOKIE]);
+        } else {
+            $nonce = JWT::urlsafeB64Encode(openssl_random_pseudo_bytes(15));
+            $cookie = $this->jwtEncode([self::FIELD_NONCE => $nonce]);
+        }
 
         $requestJWT = $this->jwtEncode([
-            'st' => $state + [
+            'st' => [
                 self::FIELD_NONCE => $nonce,
-            ],
+            ] + $state,
             'rurl' => $this->getRedirectUrl(),
         ]);
         $requestUrl = $this->getAuthenticateUrlWithSeparator().http_build_query(['jwt' => $requestJWT]);
