@@ -115,13 +115,12 @@ class JsConnectServerTest extends TestCase {
      */
     public function testCookieReuse(): void {
         list($_, $cookie) = $this->jsc->generateRequest();
+        sleep(1);
         list($_, $cookie2) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => $cookie]);
+        $this->assertSame($cookie, $cookie2);
 
-        $decoded = $this->jsc->jwtDecode($cookie);
         $decoded2 = $this->jsc->jwtDecode($cookie2);
-
         $this->assertArrayNotHasKey(JsConnectServer::FIELD_COOKIE, $decoded2, "The cookie should be double encoded.");
-        $this->assertSame($decoded[JsConnectServer::FIELD_NONCE], $decoded2[JsConnectServer::FIELD_NONCE]);
     }
 
     /**
