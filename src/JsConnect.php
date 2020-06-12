@@ -65,6 +65,11 @@ class JsConnect {
     protected $signingAlgorithm;
 
     /**
+     * @var int
+     */
+    protected $timeout = self::TIMEOUT;
+
+    /**
      * JsConnect constructor.
      */
     public function __construct() {
@@ -278,7 +283,7 @@ class JsConnect {
         $payload += [
             'v' => $this->getVersion(),
             'iat' => $this->getTimestamp(),
-            'exp' => $this->getTimestamp() + self::TIMEOUT,
+            'exp' => $this->getTimestamp() + $this->getTimeout(),
         ];
 
         $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [
@@ -404,5 +409,25 @@ class JsConnect {
      */
     public function getVersion(): string {
         return self::VERSION;
+    }
+
+    /**
+     * Get the JWT expiry timeout.
+     *
+     * @return int
+     */
+    public function getTimeout(): int {
+        return $this->timeout;
+    }
+
+    /**
+     * Set the JWT expiry timeout.
+     *
+     * @param int $timeout
+     * @return $this
+     */
+    public function setTimeout(int $timeout) {
+        $this->timeout = $timeout;
+        return $this;
     }
 }

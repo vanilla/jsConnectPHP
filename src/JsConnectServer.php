@@ -7,6 +7,7 @@
 
 namespace Vanilla\JsConnect;
 
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
 
@@ -46,6 +47,9 @@ class JsConnectServer extends JsConnect {
             // The cookie was already set. Make sure it's one of ours.
             try {
                 $decodedCookie = $this->jwtDecode($state[self::FIELD_COOKIE]);
+            } catch (ExpiredException $ex) {
+                // The cookie was valid, but expired so issue a new one.
+                goto GENERATE_COOKIE;
             } catch (\Exception $ex) {
                 throw new InvalidValueException('Could not use supplied jsConnect SSO token: '.$ex->getMessage());
             }
@@ -53,6 +57,7 @@ class JsConnectServer extends JsConnect {
             $cookie = $state[self::FIELD_COOKIE];
             unset($state[self::FIELD_COOKIE]);
         } else {
+            GENERATE_COOKIE:
             $nonce = JWT::urlsafeB64Encode(openssl_random_pseudo_bytes(15));
             $cookie = $this->jwtEncode([self::FIELD_NONCE => $nonce]);
         }

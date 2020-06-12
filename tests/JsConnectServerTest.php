@@ -124,6 +124,17 @@ class JsConnectServerTest extends TestCase {
     }
 
     /**
+     * If I try to re-use an expired, but valid cookie then a new one should be generated.
+     */
+    public function testCookieReuseTimeout(): void {
+        $this->jsc->setTimeout(1);
+        list($_, $cookie) = $this->jsc->generateRequest();
+        sleep(2);
+        list($_, $cookie2) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => $cookie]);
+        $this->assertNotSame($cookie, $cookie2);
+    }
+
+    /**
      * I should not be able to re-use any old cookie value for JsConnect.
      */
     public function testCookieReuseError(): void {
