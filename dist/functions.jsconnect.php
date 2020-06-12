@@ -404,10 +404,12 @@ class JsConnect
         return $location;
     }
     /**
+     * Decode a JWT with the connection's settings.
+     *
      * @param string $jwt
      * @return array
      */
-    protected function jwtDecode(string $jwt) : array
+    public function jwtDecode(string $jwt) : array
     {
         /**
          * @psalm-suppress InvalidArgument
@@ -464,7 +466,7 @@ class JsConnect
      * @param array $payload
      * @return string
      */
-    protected function jwtEncode(array $payload) : string
+    public function jwtEncode(array $payload) : string
     {
         $payload += ['v' => $this->getVersion(), 'iat' => $this->getTimestamp(), 'exp' => $this->getTimestamp() + self::TIMEOUT];
         $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [self::FIELD_CLIENT_ID => $this->getSigningClientID()]);
