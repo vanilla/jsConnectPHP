@@ -43,9 +43,9 @@ final class JsConnectJSONP
         $jsc = new JsConnect();
         $jsc->setSigningCredentials($clientID, $secret);
         foreach ($user as $key => $value) {
-            $key = strtolower($key);
-            if (isset(self::FIELD_MAP[$key])) {
-                $key = self::FIELD_MAP[$key];
+            $lkey = strtolower($key);
+            if (isset(self::FIELD_MAP[$lkey])) {
+                $key = self::FIELD_MAP[$lkey];
             }
             $jsc->setUserField($key, $value);
         }
