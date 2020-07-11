@@ -49,7 +49,7 @@ if ($signedIn) {
 }
 
 // 4. Generate the jsConnect response and redirect.
-$jsConnect->handleReques($_GET);
+$jsConnect->handleRequest($_GET);
 
 ```
 
