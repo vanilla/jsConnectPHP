@@ -9,6 +9,7 @@ namespace Vanilla\JsConnect;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use UnexpectedValueException;
 use Vanilla\JsConnect\Exceptions\FieldNotFoundException;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
@@ -225,7 +226,7 @@ class JsConnect {
         /**
          * @psalm-suppress InvalidArgument
          */
-        $payload = JWT::decode($jwt, $this->keys, self::ALLOWED_ALGORITHMS);
+        $payload = JWT::decode($jwt, $this->keys);
         $payload = $this->stdClassToArray($payload);
         return $payload;
     }
@@ -310,7 +311,9 @@ class JsConnect {
      * @return string
      */
     public function getSigningSecret(): string {
-        return $this->keys[$this->signingClientID];
+        return $this->keys[$this->signingClientID] instanceof Key
+            ? $this->keys[$this->signingClientID]->getKeyMaterial()
+            : '';
     }
 
     /**
@@ -363,7 +366,7 @@ class JsConnect {
      * @return $this
      */
     public function setSigningCredentials(string $clientID, string $secret) {
-        $this->keys[$clientID] = $secret;
+        $this->keys[$clientID] = $this->makeKey($secret);
         $this->signingClientID = $clientID;
         return $this;
     }
@@ -429,5 +432,9 @@ class JsConnect {
     public function setTimeout(int $timeout) {
         $this->timeout = $timeout;
         return $this;
+    }
+
+    protected function makeKey(string $keyMaterial): Key {
+        return new Key($keyMaterial, $this->getSigningAlgorithm());
     }
 }

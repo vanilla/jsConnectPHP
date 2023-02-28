@@ -109,7 +109,7 @@ class JsConnectServer extends JsConnect {
      * @return $this
      */
     public function addKey(string $clientID, string $secret) {
-        $this->keys[$clientID] = $secret;
+        $this->keys[$clientID] = $this->makeKey($secret);
         return $this;
     }
 
