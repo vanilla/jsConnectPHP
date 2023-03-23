@@ -14,7 +14,8 @@ use Vanilla\JsConnect\JsConnectServer;
 /**
  * Tests for the `JsConnectServer` class.
  */
-class JsConnectServerTest extends TestCase {
+class JsConnectServerTest extends TestCase
+{
     use JsConnectTestTrait;
 
     private $jsc;
@@ -22,25 +23,29 @@ class JsConnectServerTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->jsc = new JsConnectServer();
         $this->initializeJsConnect($this->jsc);
 
         $this->jsc
-            ->setAuthenticateUrl('https://example.com/authenticate')
-            ->setRedirectUrl('https://example.com/redirect');
+            ->setAuthenticateUrl("https://example.com/authenticate")
+            ->setRedirectUrl("https://example.com/redirect");
     }
 
     /**
      * Test a full SSO flow.
      */
-    public function testBasicHappyFlow() {
+    public function testBasicHappyFlow()
+    {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
 
         // 2. The client authenticates the request and generates a response.
-        $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl));
+        $responseLocation = $this->jsc->generateResponseLocation(
+            $this->jwtFromUrl($requestUrl)
+        );
 
         // 3. Vanilla verifies the response.
         list($user) = $this->jsc->validateResponse(
@@ -54,13 +59,16 @@ class JsConnectServerTest extends TestCase {
     /**
      * Test a full SSO flow with a signed out user (guest).
      */
-    public function testGuestHappyFlow() {
+    public function testGuestHappyFlow()
+    {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
 
         // 2. The client authenticates the request and generates a response.
         $this->jsc->setGuest(true);
-        $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl));
+        $responseLocation = $this->jsc->generateResponseLocation(
+            $this->jwtFromUrl($requestUrl)
+        );
 
         // 3. Vanilla verifies the response.
         list($user, $state) = $this->jsc->validateResponse(
@@ -74,17 +82,20 @@ class JsConnectServerTest extends TestCase {
     /**
      * Test an SSO flow that should fail due to an invalid nonce.
      */
-    public function testInvalidNonce() {
+    public function testInvalidNonce()
+    {
         // 1. Vanilla generate the request.
         list($requestUrl1, $cookie1) = $this->jsc->generateRequest();
         list($requestUrl2, $cookie2) = $this->jsc->generateRequest();
 
         // 2. The client authenticates the request and generates a response.
-        $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl1));
+        $responseLocation = $this->jsc->generateResponseLocation(
+            $this->jwtFromUrl($requestUrl1)
+        );
 
         // 3. Vanilla verifies the response.
         $this->expectException(InvalidValueException::class);
-        $this->expectExceptionMessage('The response nonce is invalid.');
+        $this->expectExceptionMessage("The response nonce is invalid.");
         list($user, $state) = $this->jsc->validateResponse(
             $this->jwtFromUrl($responseLocation, PHP_URL_FRAGMENT),
             $cookie2
@@ -94,52 +105,70 @@ class JsConnectServerTest extends TestCase {
     /**
      * Test an SSO flow that should fail due to a missing cookie.
      */
-    public function testMissingCookie() {
+    public function testMissingCookie()
+    {
         // 1. Vanilla generate the request.
         list($requestUrl, $cookie) = $this->jsc->generateRequest();
 
         // 2. The client authenticates the request and generates a response.
-        $responseLocation = $this->jsc->generateResponseLocation($this->jwtFromUrl($requestUrl));
+        $responseLocation = $this->jsc->generateResponseLocation(
+            $this->jwtFromUrl($requestUrl)
+        );
 
         // 3. Vanilla verifies the response.
         $this->expectException(InvalidValueException::class);
-        $this->expectExceptionMessage('State cookie cannot be empty.');
+        $this->expectExceptionMessage("State cookie cannot be empty.");
         $this->jsc->validateResponse(
             $this->jwtFromUrl($responseLocation, PHP_URL_FRAGMENT),
-            ''
+            ""
         );
     }
 
     /**
      * I should be able to re-use my cookie if I pass it back to another generate request.
      */
-    public function testCookieReuse(): void {
+    public function testCookieReuse(): void
+    {
         list($_, $cookie) = $this->jsc->generateRequest();
         sleep(1);
-        list($_, $cookie2) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => $cookie]);
+        list($_, $cookie2) = $this->jsc->generateRequest([
+            JsConnectServer::FIELD_COOKIE => $cookie,
+        ]);
         $this->assertSame($cookie, $cookie2);
 
         $decoded2 = $this->jsc->jwtDecode($cookie2);
-        $this->assertArrayNotHasKey(JsConnectServer::FIELD_COOKIE, $decoded2, "The cookie should be double encoded.");
+        $this->assertArrayNotHasKey(
+            JsConnectServer::FIELD_COOKIE,
+            $decoded2,
+            "The cookie should be double encoded."
+        );
     }
 
     /**
      * If I try to re-use an expired, but valid cookie then a new one should be generated.
      */
-    public function testCookieReuseTimeout(): void {
+    public function testCookieReuseTimeout(): void
+    {
         $this->jsc->setTimeout(1);
         list($_, $cookie) = $this->jsc->generateRequest();
         sleep(2);
-        list($_, $cookie2) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => $cookie]);
+        list($_, $cookie2) = $this->jsc->generateRequest([
+            JsConnectServer::FIELD_COOKIE => $cookie,
+        ]);
         $this->assertNotSame($cookie, $cookie2);
     }
 
     /**
      * I should not be able to re-use any old cookie value for JsConnect.
      */
-    public function testCookieReuseError(): void {
+    public function testCookieReuseError(): void
+    {
         $this->expectException(InvalidValueException::class);
-        $this->expectExceptionMessage("Could not use supplied jsConnect SSO token");
-        list($_, $cookie) = $this->jsc->generateRequest([JsConnectServer::FIELD_COOKIE => 'cook']);
+        $this->expectExceptionMessage(
+            "Could not use supplied jsConnect SSO token"
+        );
+        list($_, $cookie) = $this->jsc->generateRequest([
+            JsConnectServer::FIELD_COOKIE => "cook",
+        ]);
     }
 }

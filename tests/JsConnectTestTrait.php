@@ -12,7 +12,8 @@ use Vanilla\JsConnect\JsConnect;
 /**
  * Convenience methods for jsConnect tests.
  */
-trait JsConnectTestTrait {
+trait JsConnectTestTrait
+{
     /**
      * Grab the JWT from a URL.
      *
@@ -20,9 +21,10 @@ trait JsConnectTestTrait {
      * @param int $part
      * @return string
      */
-    protected function jwtFromUrl(string $url, $part = PHP_URL_QUERY): string {
+    protected function jwtFromUrl(string $url, $part = PHP_URL_QUERY): string
+    {
         parse_str(parse_url($url, $part), $query);
-        return $query['jwt'];
+        return $query["jwt"];
     }
 
     /**
@@ -30,13 +32,14 @@ trait JsConnectTestTrait {
      *
      * @param JsConnect $jsc
      */
-    protected function initializeJsConnect(JsConnect $jsc) {
-        $jsc->setSigningCredentials('foo', 'bar');
+    protected function initializeJsConnect(JsConnect $jsc)
+    {
+        $jsc->setSigningCredentials("foo", "bar");
 
-        $jsc->setUniqueID('id123');
-        $jsc->setName('frank');
-        $jsc->setEmail('frank@example.com');
-        $jsc->setPhotoURL('https://example.com/avatar.jpg');
+        $jsc->setUniqueID("id123");
+        $jsc->setName("frank");
+        $jsc->setEmail("frank@example.com");
+        $jsc->setPhotoURL("https://example.com/avatar.jpg");
         $jsc->setRoles([1, 2]);
     }
 }

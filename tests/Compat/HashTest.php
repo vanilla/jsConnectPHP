@@ -12,33 +12,40 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests hashing
  */
-class HashTest extends TestCase {
-
+class HashTest extends TestCase
+{
     /**
      *  Test {@link jsHash} with no $secure parameter.
      */
-    public function testHashDefault() {
-        $this->assertEquals(md5('hashMe'), jsHash('hashMe'));
+    public function testHashDefault()
+    {
+        $this->assertEquals(md5("hashMe"), jsHash("hashMe"));
     }
 
     /**
      *  Test {@link jsHash} with true as the $secure parameter.
      */
-    public function testHashSecureTrue() {
-        $this->assertEquals(md5('hashMe'), jsHash('hashMe', true));
+    public function testHashSecureTrue()
+    {
+        $this->assertEquals(md5("hashMe"), jsHash("hashMe", true));
     }
 
     /**
      *  Test {@link jsHash} with 'md5' as the $secure parameter.
      */
-    public function testHashSecureMD5() {
-        $this->assertEquals(md5('hashMe'), jsHash('hashMe', 'md5'));
+    public function testHashSecureMD5()
+    {
+        $this->assertEquals(md5("hashMe"), jsHash("hashMe", "md5"));
     }
 
     /**
      *  Test {@link jsHash} with 'sha256' as the $secure parameter.
      */
-    public function testHashSecureSHA256() {
-        $this->assertEquals(hash('sha256', 'hashMe'), jsHash('hashMe', 'sha256'));
+    public function testHashSecureSHA256()
+    {
+        $this->assertEquals(
+            hash("sha256", "hashMe"),
+            jsHash("hashMe", "sha256")
+        );
     }
 }
