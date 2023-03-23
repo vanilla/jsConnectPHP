@@ -10,10 +10,7 @@
             "name": "frank",
             "email": "frank@example.com",
             "photo": "https://example.com/avatar.jpg",
-            "roles": [
-                1,
-                2
-            ]
+            "roles": [1, 2]
         },
         "exception": "SignatureInvalidException",
         "message": "Signature verification failed"
@@ -29,10 +26,7 @@
             "name": "frank",
             "email": "frank@example.com",
             "photo": "https://example.com/avatar.jpg",
-            "roles": [
-                1,
-                2
-            ]
+            "roles": [1, 2]
         },
         "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoiT280c1JzNHl4WVZoN2pTdEVzRW8ifSwidiI6InRlc3Q6MyIsImlhdCI6MTU3NzgzNjgwMCwiZXhwIjoxNTc3ODM3NDAwfQ.unPrm-TuI8IoY3AfazUZNEqyMKK7a58Pd97WedwreZw"
     },
@@ -56,10 +50,7 @@
             "name": "frank",
             "email": "frank@example.com",
             "photo": "https://example.com/avatar.jpg",
-            "roles": [
-                1,
-                2
-            ]
+            "roles": [1, 2]
         },
         "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoib0h3RVNOM2lLbUJDeE1LSnRiUTEiLCJ0IjoiL2ZvbyJ9LCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.ojfBkKRFC-h1Xx18qeLfsCAxZ84XiN9oSYhxZ-R-Olc"
     },
@@ -74,10 +65,7 @@
             "name": "frank",
             "email": "frank@example.com",
             "photo": "https://example.com/avatar.jpg",
-            "roles": [
-                1,
-                2
-            ]
+            "roles": [1, 2]
         },
         "exception": "ExpiredException",
         "message": "Expired token"
