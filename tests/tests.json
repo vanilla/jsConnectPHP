@@ -1,6 +1,6 @@
 {
     "bad-secret": {
-        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoia1FjZ1lGbHo1azBFa0EzWWFXeUkifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.4-1N-VZCaJbVG3Cs4IB4bL8ToUu-uSKJwxjdIZlifss",
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoieWlKbElld1FGVDl0RHZnWGlldE4ifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.XmMZYUuybrFK1we_8CN2WUtXrLiDuwhPXstZeLHf2po",
         "clientID": "foo",
         "secret": "foo",
         "version": "test:3",
@@ -19,7 +19,7 @@
         "message": "Signature verification failed"
     },
     "basic": {
-        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiMjRySlZscUZfWkx2SGhfU1JrRTkifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.pxqDXSQk6nQzdGgOGYUSsWFYMpvlTKndP1ad1-KiSww",
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiT280c1JzNHl4WVZoN2pTdEVzRW8ifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.JuKgmP0C_5tLWX4qNJI-Usnngeq11o_wKOVE6kvC0e8",
         "clientID": "foo",
         "secret": "bar",
         "version": "test:3",
@@ -34,19 +34,19 @@
                 2
             ]
         },
-        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoiMjRySlZscUZfWkx2SGhfU1JrRTkifSwidiI6InRlc3Q6MyIsImlhdCI6MTU3NzgzNjgwMCwiZXhwIjoxNTc3ODM3NDAwfQ.2UMpINdDRpKTIBwxYJkef-NvfeiVzuWTkEsbTiU3zNg"
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoiT280c1JzNHl4WVZoN2pTdEVzRW8ifSwidiI6InRlc3Q6MyIsImlhdCI6MTU3NzgzNjgwMCwiZXhwIjoxNTc3ODM3NDAwfQ.unPrm-TuI8IoY3AfazUZNEqyMKK7a58Pd97WedwreZw"
     },
     "basic-guest": {
-        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiR3dJb24yaWJZN2RuTjBSMEozMUYifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.8AfCmQjG-xX3kBw0RVDbxelo4sjZ8aP7eaAakAx_qQs",
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoibTc0clJxYU1GMUdTRDhKMmdSYi0ifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.F4gu21mRJic3bNbMaGH6XztQsRsLN-w8Gx1GMoqWNdk",
         "clientID": "foo",
         "secret": "bar",
         "version": "test:3",
         "timestamp": 1577836800,
         "user": {},
-        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7fSwic3QiOnsibiI6Ikd3SW9uMmliWTdkbk4wUjBKMzFGIn0sInYiOiJ0ZXN0OjMiLCJpYXQiOjE1Nzc4MzY4MDAsImV4cCI6MTU3NzgzNzQwMH0.V3K6GpOGI1ha4en8MuYZf7vDPLqcQjxMKU1JPtOfM5U"
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7fSwic3QiOnsibiI6Im03NHJScWFNRjFHU0Q4SjJnUmItIn0sInYiOiJ0ZXN0OjMiLCJpYXQiOjE1Nzc4MzY4MDAsImV4cCI6MTU3NzgzNzQwMH0.VhxdLh2LfjYa6GQfUQBzak8Y5T49W9MqDWFO5AkbCQw"
     },
     "basic-state": {
-        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiRGo4QVRleUVINU5lZ3JiRnlBV3YiLCJ0IjoiL2ZvbyJ9LCJydXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9yZWRpcmVjdCIsInYiOiJ0ZXN0OjMiLCJpYXQiOjE1Nzc4MzY4MDAsImV4cCI6MTU3NzgzNzQwMH0.kGEFxKPuIDSUL2mE0CGlcr3kP1_jk5Kqg-JSeLOJEHM",
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoib0h3RVNOM2lLbUJDeE1LSnRiUTEiLCJ0IjoiL2ZvbyJ9LCJydXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9yZWRpcmVjdCIsInYiOiJ0ZXN0OjMiLCJpYXQiOjE1Nzc4MzY4MDAsImV4cCI6MTU3NzgzNzQwMH0.fMAn5eD24GLru_6uRbkVJEhygDc6YlqseCZbOuTlcD0",
         "clientID": "foo",
         "secret": "bar",
         "version": "test:3",
@@ -61,10 +61,10 @@
                 2
             ]
         },
-        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoiRGo4QVRleUVINU5lZ3JiRnlBV3YiLCJ0IjoiL2ZvbyJ9LCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.jq2wm1Ger22dhxmX2lDN3Rbq0XZwhF1ikQuvVA_plR4"
+        "response": "https://example.com/redirect#jwt=eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1Ijp7ImlkIjoiaWQxMjMiLCJuYW1lIjoiZnJhbmsiLCJlbWFpbCI6ImZyYW5rQGV4YW1wbGUuY29tIiwicGhvdG8iOiJodHRwczovL2V4YW1wbGUuY29tL2F2YXRhci5qcGciLCJyb2xlcyI6WzEsMl19LCJzdCI6eyJuIjoib0h3RVNOM2lLbUJDeE1LSnRiUTEiLCJ0IjoiL2ZvbyJ9LCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.ojfBkKRFC-h1Xx18qeLfsCAxZ84XiN9oSYhxZ-R-Olc"
     },
     "expired-token": {
-        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiRkhxUjFEb2JMaDBtTmxod3F6SnoifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.sb0W1croEW4WMIaxDXAfIzwhgrR5CKqBE3trf6_N2gY",
+        "jwt": "eyJraWQiOiJmb28iLCJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdCI6eyJuIjoiWjNOdnBEUUY0bzBGeHlHUjJIbG4ifSwicnVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcmVkaXJlY3QiLCJ2IjoidGVzdDozIiwiaWF0IjoxNTc3ODM2ODAwLCJleHAiOjE1Nzc4Mzc0MDB9.3X59g0tvGSPc8OvBJFDG6TtmADgH6Zr62O53G8nmw1A",
         "clientID": "foo",
         "secret": "bar",
         "version": "test:3",
