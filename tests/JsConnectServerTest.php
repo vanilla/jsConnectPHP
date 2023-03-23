@@ -22,7 +22,7 @@ class JsConnectServerTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->jsc = new JsConnectServer();
         $this->initializeJsConnect($this->jsc);

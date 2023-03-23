@@ -32,7 +32,7 @@ class GenerateTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         JWT::$timestamp = self::TIMESTAMP;
         $this->jsc = new TestJsConnect();
@@ -46,7 +46,7 @@ class GenerateTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         JWT::$timestamp = null;
     }

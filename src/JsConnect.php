@@ -9,6 +9,7 @@ namespace Vanilla\JsConnect;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use UnexpectedValueException;
 use Vanilla\JsConnect\Exceptions\FieldNotFoundException;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
@@ -104,7 +105,7 @@ class JsConnect {
     }
 
     /**
-     * Set the a field on the current user.
+     * Set a field on the current user.
      *
      * @param string $key The key on the user.
      * @param string|int|bool|array|null $value The value to set. This must be a basic type that can be JSON encoded.
@@ -225,7 +226,11 @@ class JsConnect {
         /**
          * @psalm-suppress InvalidArgument
          */
-        $payload = JWT::decode($jwt, $this->keys, self::ALLOWED_ALGORITHMS);
+        $keys = [];
+        foreach($this->keys as $id => $key) {
+            $keys[$id] = new Key($key, $this->getSigningAlgorithm());
+        }
+        $payload = JWT::decode($jwt, $keys);
         $payload = $this->stdClassToArray($payload);
         return $payload;
     }

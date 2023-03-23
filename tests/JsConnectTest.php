@@ -26,7 +26,7 @@ class JsConnectTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->jsc = new TestJsConnect();
         $this->jsc->setSigningCredentials('foo', 'bar');
