@@ -10,6 +10,6 @@ namespace Vanilla\JsConnect\Exceptions;
 /**
  * The base class for all JsConnect exceptions.
  */
-class JsConnectException extends \Exception {
-
+class JsConnectException extends \Exception
+{
 }

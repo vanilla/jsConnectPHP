@@ -9,6 +9,7 @@ namespace Vanilla\JsConnect;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use UnexpectedValueException;
 use Vanilla\JsConnect\Exceptions\FieldNotFoundException;
 use Vanilla\JsConnect\Exceptions\InvalidValueException;
@@ -16,28 +17,35 @@ use Vanilla\JsConnect\Exceptions\InvalidValueException;
 /**
  * Handles the jsConnect protocol v3.x.
  */
-class JsConnect {
-    const VERSION = 'php:3';
+class JsConnect
+{
+    const VERSION = "php:3";
 
-    const FIELD_UNIQUE_ID = 'id';
-    const FIELD_PHOTO = 'photo';
-    const FIELD_NAME = 'name';
-    const FIELD_EMAIL = 'email';
-    const FIELD_ROLES = 'roles';
-    const FIELD_JWT = 'jwt';
+    const FIELD_UNIQUE_ID = "id";
+    const FIELD_PHOTO = "photo";
+    const FIELD_NAME = "name";
+    const FIELD_EMAIL = "email";
+    const FIELD_ROLES = "roles";
+    const FIELD_JWT = "jwt";
 
     const TIMEOUT = 10 * 60;
 
     const ALLOWED_ALGORITHMS = [
-        'ES256', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512'
+        "ES256",
+        "HS256",
+        "HS384",
+        "HS512",
+        "RS256",
+        "RS384",
+        "RS512",
     ];
 
-    const FIELD_STATE = 'st';
-    const FIELD_USER = 'u';
+    const FIELD_STATE = "st";
+    const FIELD_USER = "u";
 
-    const FIELD_REDIRECT_URL = 'rurl';
-    const FIELD_CLIENT_ID = 'kid';
-    const FIELD_TARGET = 't';
+    const FIELD_REDIRECT_URL = "rurl";
+    const FIELD_CLIENT_ID = "kid";
+    const FIELD_TARGET = "t";
 
     /**
      * @var \ArrayAccess
@@ -47,7 +55,7 @@ class JsConnect {
     /**
      * @var string string
      */
-    protected $signingClientID = '';
+    protected $signingClientID = "";
 
     /**
      * @var array
@@ -72,9 +80,10 @@ class JsConnect {
     /**
      * JsConnect constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->keys = new \ArrayObject();
-        $this->setSigningAlgorithm('HS256');
+        $this->setSigningAlgorithm("HS256");
     }
 
     /**
@@ -84,7 +93,8 @@ class JsConnect {
      * @param string $valueName The name of the value for the exception message.
      * @throws InvalidValueException Throws an exception when the value is empty.
      */
-    protected static function validateNotEmpty($value, string $valueName): void {
+    protected static function validateNotEmpty($value, string $valueName): void
+    {
         if ($value === null) {
             throw new InvalidValueException("$valueName is required.");
         }
@@ -99,18 +109,20 @@ class JsConnect {
      * @param string $email
      * @return $this
      */
-    public function setEmail(string $email) {
+    public function setEmail(string $email)
+    {
         return $this->setUserField(self::FIELD_EMAIL, $email);
     }
 
     /**
-     * Set the a field on the current user.
+     * Set a field on the current user.
      *
      * @param string $key The key on the user.
      * @param string|int|bool|array|null $value The value to set. This must be a basic type that can be JSON encoded.
      * @return $this
      */
-    public function setUserField(string $key, $value) {
+    public function setUserField(string $key, $value)
+    {
         $this->user[$key] = $value;
         return $this;
     }
@@ -121,7 +133,8 @@ class JsConnect {
      * @param string $name
      * @return $this
      */
-    public function setName(string $name) {
+    public function setName(string $name)
+    {
         return $this->setUserField(self::FIELD_NAME, $name);
     }
 
@@ -131,7 +144,8 @@ class JsConnect {
      * @param string $photo
      * @return $this
      */
-    public function setPhotoURL(string $photo) {
+    public function setPhotoURL(string $photo)
+    {
         return $this->setUserField(self::FIELD_PHOTO, $photo);
     }
 
@@ -141,7 +155,8 @@ class JsConnect {
      * @param string $id
      * @return $this
      */
-    public function setUniqueID(string $id) {
+    public function setUniqueID(string $id)
+    {
         return $this->setUserField(self::FIELD_UNIQUE_ID, $id);
     }
 
@@ -150,9 +165,14 @@ class JsConnect {
      *
      * @param array $query
      */
-    public function handleRequest(array $query): void {
+    public function handleRequest(array $query): void
+    {
         try {
-            $jwt = static::validateFieldExists(self::FIELD_JWT, $query, 'querystring');
+            $jwt = static::validateFieldExists(
+                self::FIELD_JWT,
+                $query,
+                "querystring"
+            );
             $location = $this->generateResponseLocation($jwt);
             $this->redirect($location);
         } catch (Exception $ex) {
@@ -171,7 +191,12 @@ class JsConnect {
      * @throws FieldNotFoundException Throws an exception when the field is not in the array.
      * @throws InvalidValueException Throws an exception when the collection isn't an array or the value is empty.
      */
-    protected static function validateFieldExists(string $field, $collection, string $collectionName = 'payload', bool $validateEmpty = true) {
+    protected static function validateFieldExists(
+        string $field,
+        $collection,
+        string $collectionName = "payload",
+        bool $validateEmpty = true
+    ) {
         if (!(is_array($collection) || $collection instanceof \ArrayAccess)) {
             throw new InvalidValueException("Invalid array: $collectionName");
         }
@@ -181,7 +206,9 @@ class JsConnect {
         }
 
         if ($validateEmpty && empty($collection[$field])) {
-            throw new InvalidValueException("Field cannot be empty: {$collectionName}[{$field}]");
+            throw new InvalidValueException(
+                "Field cannot be empty: {$collectionName}[{$field}]"
+            );
         }
 
         return $collection[$field];
@@ -193,7 +220,8 @@ class JsConnect {
      * @param string $requestJWT
      * @return string
      */
-    public function generateResponseLocation(string $requestJWT): string {
+    public function generateResponseLocation(string $requestJWT): string
+    {
         // Validate the request token.
         $request = $this->jwtDecode($requestJWT);
 
@@ -211,7 +239,10 @@ class JsConnect {
         }
         $response = $this->jwtEncode($data);
 
-        $location = $request[self::FIELD_REDIRECT_URL] . '#' . http_build_query(['jwt' => $response]);
+        $location =
+            $request[self::FIELD_REDIRECT_URL] .
+            "#" .
+            http_build_query(["jwt" => $response]);
         return $location;
     }
 
@@ -221,11 +252,16 @@ class JsConnect {
      * @param string $jwt
      * @return array
      */
-    public function jwtDecode(string $jwt): array {
+    public function jwtDecode(string $jwt): array
+    {
         /**
          * @psalm-suppress InvalidArgument
          */
-        $payload = JWT::decode($jwt, $this->keys, self::ALLOWED_ALGORITHMS);
+        $keys = [];
+        foreach ($this->keys as $id => $key) {
+            $keys[$id] = new Key($key, $this->getSigningAlgorithm());
+        }
+        $payload = JWT::decode($jwt, $keys);
         $payload = $this->stdClassToArray($payload);
         return $payload;
     }
@@ -236,12 +272,16 @@ class JsConnect {
      * @param array|object $o
      * @return array
      */
-    protected function stdClassToArray($o): array {
+    protected function stdClassToArray($o): array
+    {
         if (!is_array($o) && !($o instanceof \stdClass)) {
-            throw new UnexpectedValueException("JsConnect::stdClassToArray() expects an object or array, scalar given.", 400);
+            throw new UnexpectedValueException(
+                "JsConnect::stdClassToArray() expects an object or array, scalar given.",
+                400
+            );
         }
 
-        $o = (array)$o;
+        $o = (array) $o;
         $r = [];
         foreach ($o as $key => $value) {
             if (is_array($value) || is_object($value)) {
@@ -258,7 +298,8 @@ class JsConnect {
      *
      * @return bool
      */
-    public function isGuest(): bool {
+    public function isGuest(): bool
+    {
         return $this->guest;
     }
 
@@ -268,7 +309,8 @@ class JsConnect {
      * @param bool $isGuest
      * @return $this
      */
-    public function setGuest(bool $isGuest) {
+    public function setGuest(bool $isGuest)
+    {
         $this->guest = $isGuest;
         return $this;
     }
@@ -279,16 +321,23 @@ class JsConnect {
      * @param array $payload
      * @return string
      */
-    public function jwtEncode(array $payload): string {
+    public function jwtEncode(array $payload): string
+    {
         $payload += [
-            'v' => $this->getVersion(),
-            'iat' => $this->getTimestamp(),
-            'exp' => $this->getTimestamp() + $this->getTimeout(),
+            "v" => $this->getVersion(),
+            "iat" => $this->getTimestamp(),
+            "exp" => $this->getTimestamp() + $this->getTimeout(),
         ];
 
-        $jwt = JWT::encode($payload, $this->getSigningSecret(), $this->getSigningAlgorithm(), null, [
-            self::FIELD_CLIENT_ID => $this->getSigningClientID(),
-        ]);
+        $jwt = JWT::encode(
+            $payload,
+            $this->getSigningSecret(),
+            $this->getSigningAlgorithm(),
+            null,
+            [
+                self::FIELD_CLIENT_ID => $this->getSigningClientID(),
+            ]
+        );
         return $jwt;
     }
 
@@ -299,7 +348,8 @@ class JsConnect {
      *
      * @return int
      */
-    protected function getTimestamp(): int {
+    protected function getTimestamp(): int
+    {
         $r = JWT::$timestamp ?: time();
         return $r;
     }
@@ -309,7 +359,8 @@ class JsConnect {
      *
      * @return string
      */
-    public function getSigningSecret(): string {
+    public function getSigningSecret(): string
+    {
         return $this->keys[$this->signingClientID];
     }
 
@@ -318,7 +369,8 @@ class JsConnect {
      *
      * @return string
      */
-    public function getSigningAlgorithm(): string {
+    public function getSigningAlgorithm(): string
+    {
         return $this->signingAlgorithm;
     }
 
@@ -328,9 +380,10 @@ class JsConnect {
      * @param string $signingAlgorithm
      * @return $this
      */
-    public function setSigningAlgorithm(string $signingAlgorithm) {
+    public function setSigningAlgorithm(string $signingAlgorithm)
+    {
         if (!in_array($signingAlgorithm, static::ALLOWED_ALGORITHMS)) {
-            throw new UnexpectedValueException('Algorithm not allowed');
+            throw new UnexpectedValueException("Algorithm not allowed");
         }
         $this->signingAlgorithm = $signingAlgorithm;
         return $this;
@@ -341,7 +394,8 @@ class JsConnect {
      *
      * @return string
      */
-    public function getSigningClientID(): string {
+    public function getSigningClientID(): string
+    {
         return $this->signingClientID;
     }
 
@@ -350,7 +404,8 @@ class JsConnect {
      *
      * @param string $location
      */
-    protected function redirect(string $location): void {
+    protected function redirect(string $location): void
+    {
         header("Location: $location", true, 302);
         die();
     }
@@ -362,13 +417,15 @@ class JsConnect {
      * @param string $secret
      * @return $this
      */
-    public function setSigningCredentials(string $clientID, string $secret) {
+    public function setSigningCredentials(string $clientID, string $secret)
+    {
         $this->keys[$clientID] = $secret;
         $this->signingClientID = $clientID;
         return $this;
     }
 
-    public function getUser(): array {
+    public function getUser(): array
+    {
         return $this->user;
     }
 
@@ -378,7 +435,8 @@ class JsConnect {
      * @param array $roles
      * @return $this
      */
-    public function setRoles(array $roles) {
+    public function setRoles(array $roles)
+    {
         $this->setUserField(self::FIELD_ROLES, $roles);
         return $this;
     }
@@ -390,14 +448,18 @@ class JsConnect {
      *
      * @return array|null
      */
-    final public static function decodeJWTHeader(string $jwt): ?array {
-        $tks = explode('.', $jwt);
+    final public static function decodeJWTHeader(string $jwt): ?array
+    {
+        $tks = explode(".", $jwt);
         if (count($tks) != 3) {
-            throw new UnexpectedValueException('Wrong number of segments');
+            throw new UnexpectedValueException("Wrong number of segments");
         }
         list($headb64) = $tks;
-        if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))) {
-            throw new UnexpectedValueException('Invalid header encoding');
+        if (
+            null ===
+            ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))
+        ) {
+            throw new UnexpectedValueException("Invalid header encoding");
         }
         return json_decode(json_encode($header), true);
     }
@@ -407,7 +469,8 @@ class JsConnect {
      *
      * @return string
      */
-    public function getVersion(): string {
+    public function getVersion(): string
+    {
         return self::VERSION;
     }
 
@@ -416,7 +479,8 @@ class JsConnect {
      *
      * @return int
      */
-    public function getTimeout(): int {
+    public function getTimeout(): int
+    {
         return $this->timeout;
     }
 
@@ -426,7 +490,8 @@ class JsConnect {
      * @param int $timeout
      * @return $this
      */
-    public function setTimeout(int $timeout) {
+    public function setTimeout(int $timeout)
+    {
         $this->timeout = $timeout;
         return $this;
     }

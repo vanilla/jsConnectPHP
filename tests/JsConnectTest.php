@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license MIT
  */
 
@@ -20,76 +20,90 @@ use Vanilla\JsConnect\Tests\Fixtures\TestJsConnect;
  * Class JsConnectTest
  * @package Vanilla\JsConnect\Tests
  */
-class JsConnectTest extends TestCase {
+class JsConnectTest extends TestCase
+{
     private $jsc;
 
     /**
      * {@inheritDoc}
      */
-    public function setUp() {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->jsc = new TestJsConnect();
-        $this->jsc->setSigningCredentials('foo', 'bar');
+        $this->jsc->setSigningCredentials("foo", "bar");
     }
 
     /**
      * Test signing algorithm access.
      */
-    public function testSigningAlgorithmAccess() {
-        $this->jsc->setSigningAlgorithm('HS512');
-        $this->assertSame('HS512', $this->jsc->getSigningAlgorithm());
+    public function testSigningAlgorithmAccess()
+    {
+        $this->jsc->setSigningAlgorithm("HS512");
+        $this->assertSame("HS512", $this->jsc->getSigningAlgorithm());
     }
 
     /**
      * A whitelist of signing algorithms are allowed.
      */
-    public function testInvalidSigningAlgorithm() {
+    public function testInvalidSigningAlgorithm()
+    {
         $this->expectException(\UnexpectedValueException::class);
-        $this->jsc->setSigningAlgorithm('none');
+        $this->jsc->setSigningAlgorithm("none");
     }
 
     /**
      * Test field validation.
      */
-    public function testValidateFieldExistsBadCollection() {
+    public function testValidateFieldExistsBadCollection()
+    {
         $this->expectException(InvalidValueException::class);
-        $this->expectExceptionMessage('Invalid array: baz');
-        TestJsConnect::validateFieldExists('foo', 'bar', 'baz');
+        $this->expectExceptionMessage("Invalid array: baz");
+        TestJsConnect::validateFieldExists("foo", "bar", "baz");
     }
 
     /**
      * A missing key should be a specific exception.
      */
-    public function testValidateFieldExistsFieldNotSet() {
+    public function testValidateFieldExistsFieldNotSet()
+    {
         $this->expectException(FieldNotFoundException::class);
         $this->expectExceptionMessage("Missing field: bar[foo]");
-        TestJsConnect::validateFieldExists('foo', [], 'bar');
+        TestJsConnect::validateFieldExists("foo", [], "bar");
     }
 
     /**
      * An empty value should be a specific exception.
      */
-    public function testValidateFieldExistsFieldEmpty() {
+    public function testValidateFieldExistsFieldEmpty()
+    {
         $this->expectException(InvalidValueException::class);
         $this->expectExceptionMessage("Field cannot be empty: bar[foo]");
-        TestJsConnect::validateFieldExists('foo', ['foo' => ''], 'bar');
+        TestJsConnect::validateFieldExists("foo", ["foo" => ""], "bar");
     }
 
     /**
      * A supplied field should NOT be an exception.
      */
-    public function testValidateFieldExistsFieldEmptyOK() {
-        $actual = TestJsConnect::validateFieldExists('foo', ['foo' => ''], 'bar', false);
-        $this->assertSame('', $actual);
+    public function testValidateFieldExistsFieldEmptyOK()
+    {
+        $actual = TestJsConnect::validateFieldExists(
+            "foo",
+            ["foo" => ""],
+            "bar",
+            false
+        );
+        $this->assertSame("", $actual);
     }
 
     /**
      * Test a basic use of JWT header decoding.
      */
-    public function testDecodeHeader() {
-        $expected = ['foo' => 'bar'];
+    public function testDecodeHeader()
+    {
+        $expected = ["foo" => "bar"];
 
-        $jwt = JWT::encode([], 'foo', 'HS256', 'kid', $expected);
+        $jwt = JWT::encode([], "foo", "HS256", "kid", $expected);
         $actual = JsConnect::decodeJWTHeader($jwt);
         $this->assertSame($expected, array_intersect($expected, $actual));
     }

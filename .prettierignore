@@ -1,0 +1,25 @@
+# vendor files
+node_modules
+vendor
+artisan
+_ide_helper*
+*.lock
+package-lock.json
+
+# App writeable directories
+bootstrap/cache
+cache
+storage
+dist
+build-config.php
+LICENSE.md
+README.md
+tests/tests.json
+
+# IDE Config
+.vscode
+.idea
+
+# Test output
+.phpunit.result.cache
+

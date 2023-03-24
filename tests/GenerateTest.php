@@ -18,11 +18,12 @@ use Vanilla\JsConnect\Tests\Fixtures\TestJsConnect;
 /**
  * Tests that generate a JSON data file for other libraries to use.
  */
-class GenerateTest extends TestCase {
+class GenerateTest extends TestCase
+{
     use JsConnectTestTrait;
 
     const TIMESTAMP = 1577836800;
-    const NONCE = 'nonce';
+    const NONCE = "nonce";
 
     /**
      * @var JsConnectServer
@@ -32,21 +33,23 @@ class GenerateTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp() {
+    public function setUp(): void
+    {
         parent::setUp();
         JWT::$timestamp = self::TIMESTAMP;
         $this->jsc = new TestJsConnect();
         $this->initializeJsConnect($this->jsc);
 
         $this->jsc
-            ->setAuthenticateUrl('https://example.com/authenticate')
-            ->setRedirectUrl('https://example.com/redirect');
+            ->setAuthenticateUrl("https://example.com/authenticate")
+            ->setRedirectUrl("https://example.com/redirect");
     }
 
     /**
      * @inheritDoc
      */
-    public function tearDown() {
+    public function tearDown(): void
+    {
         parent::tearDown();
         JWT::$timestamp = null;
     }
@@ -59,7 +62,8 @@ class GenerateTest extends TestCase {
      * @return array
      * @throws \Exception Throws an exception if the response is an exception response.
      */
-    protected function writeTest(string $name, string $jwt): array {
+    protected function writeTest(string $name, string $jwt): array
+    {
         if ($this->jsc->isGuest()) {
             $user = new \stdClass();
         } else {
@@ -67,33 +71,35 @@ class GenerateTest extends TestCase {
         }
 
         $data = [
-            'jwt' => $jwt,
-            'clientID' => $this->jsc->getSigningClientID(),
-            'secret' => $this->jsc->getSigningSecret(),
-            'version' => $this->jsc->getVersion(),
-            'timestamp' => JWT::$timestamp,
-            'user' => $this->jsc->isGuest() ? new \stdClass() : $this->jsc->getUser(),
+            "jwt" => $jwt,
+            "clientID" => $this->jsc->getSigningClientID(),
+            "secret" => $this->jsc->getSigningSecret(),
+            "version" => $this->jsc->getVersion(),
+            "timestamp" => JWT::$timestamp,
+            "user" => $this->jsc->isGuest()
+                ? new \stdClass()
+                : $this->jsc->getUser(),
         ];
 
         try {
             $url = $this->jsc->generateResponseLocation($jwt);
             $data += [
-                'user' => $user,
-                'response' => $url,
+                "user" => $user,
+                "response" => $url,
             ];
         } catch (\Exception $ex) {
             $exception = get_class($ex);
-            $exception = substr($exception, strrpos($exception, '\\') + 1);
+            $exception = substr($exception, strrpos($exception, "\\") + 1);
 
             $data += [
-                'exception' => $exception,
-                'message' => $ex->getMessage(),
+                "exception" => $exception,
+                "message" => $ex->getMessage(),
             ];
         }
 
-        $path = __DIR__.'/tests.json';
+        $path = __DIR__ . "/tests.json";
         if (file_exists($path)) {
-            $json = (array)json_decode(file_get_contents($path));
+            $json = (array) json_decode(file_get_contents($path));
             $this->assertNotNull($json);
         } else {
             $json = [];
@@ -101,7 +107,10 @@ class GenerateTest extends TestCase {
 
         $json[$name] = $data;
         ksort($json);
-        $r = file_put_contents($path, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $r = file_put_contents(
+            $path,
+            json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
         $this->assertNotFalse($r);
 
         if (isset($ex)) {
@@ -114,13 +123,15 @@ class GenerateTest extends TestCase {
     /**
      * @return string
      */
-    protected function generateRequestJWT(array $state = []): string {
+    protected function generateRequestJWT(array $state = []): string
+    {
         [$url] = $this->jsc->generateRequest($state, self::NONCE);
         $jwt = $this->jwtFromUrl($url);
         return $jwt;
     }
 
-    protected function generateTest($name, $state = []): array {
+    protected function generateTest($name, $state = []): array
+    {
         $jwt = $this->generateRequestJWT($state);
         $r = $this->writeTest($name, $jwt);
         return $r;
@@ -129,42 +140,50 @@ class GenerateTest extends TestCase {
     /**
      * Test a basic successful flow.
      */
-    public function testBasic() {
-        $r = $this->generateTest('basic');
+    public function testBasic()
+    {
+        $r = $this->generateTest("basic");
     }
 
     /**
      * Test a basic successful flow with a guest user.
      */
-    public function testBasicGuest() {
+    public function testBasicGuest()
+    {
         $this->jsc->setGuest(true);
-        $this->generateTest('basic-guest');
+        $this->generateTest("basic-guest");
     }
 
     /**
      * Test state passing through.
      */
-    public function testBasicWithState() {
-        $this->generateTest('basic-state', [JsConnect::FIELD_TARGET => '/foo']);
+    public function testBasicWithState()
+    {
+        $this->generateTest("basic-state", [JsConnect::FIELD_TARGET => "/foo"]);
     }
 
     /**
      * Test an invalid secret.
      */
-    public function testBadSecret() {
+    public function testBadSecret()
+    {
         $jwt = $this->generateRequestJWT();
-        $this->jsc->setSigningCredentials($this->jsc->getSigningClientID(), 'foo');
+        $this->jsc->setSigningCredentials(
+            $this->jsc->getSigningClientID(),
+            "foo"
+        );
         $this->expectException(SignatureInvalidException::class);
-        $this->writeTest('bad-secret', $jwt);
+        $this->writeTest("bad-secret", $jwt);
     }
 
     /**
      * Test an expired token.
      */
-    public function testExpiredToken() {
+    public function testExpiredToken()
+    {
         $jwt = $this->generateRequestJWT();
         JWT::$timestamp += 1000000;
         $this->expectException(ExpiredException::class);
-        $this->writeTest('expired-token', $jwt);
+        $this->writeTest("expired-token", $jwt);
     }
 }
